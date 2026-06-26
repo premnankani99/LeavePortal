@@ -5,6 +5,9 @@ import ApplyLeave from './pages/ApplyLeave';
 import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import VerifyOTP from './pages/VerifyOTP';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import Layout from './components/layout/Layout';
@@ -14,12 +17,9 @@ import PendingVerification from './pages/PendingVerification';
 import AdminLeaveQueue from './pages/AdminLeaveQueue';
 import AdminVerificationQueue from './pages/AdminVerificationQueue';
 import AdminEmployees from './pages/AdminEmployees';
-import AdminAnnouncements from './pages/AdminAnnouncements';
 import Holidays from './pages/Holidays';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications';
-import Announcements from './pages/Announcements';
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Component to protect routes
@@ -53,6 +53,9 @@ function App() {
                 {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/verify-otp" element={<VerifyOTP />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 
                 {/* Protected Routes wrapped in Layout */}
                 <Route path="/" element={

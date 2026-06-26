@@ -31,13 +31,16 @@ model profiles {
   available_leaves    Float              @default(20)
   is_active           Boolean            @default(false)
   is_deleted          Boolean            @default(false)
+  email_verified      Boolean            @default(false)
+  otp_code            String?
+  otp_expires_at      DateTime?
+  reset_token         String?
+  reset_token_expires_at DateTime?
   verification_status String             @default("pending")
   created_at          DateTime           @default(now())
   updated_at          DateTime           @updatedAt
   leave_requests      leave_requests[]   @relation("EmployeeLeaves")
   approved_leaves     leave_requests[]   @relation("ApprovedLeaves")
-  announcements       announcements[]
-  announcement_reads  announcement_reads[]
 }
 
 model leave_requests {
@@ -72,31 +75,6 @@ model holidays {
   description String?  @db.Text
   type        String   @default("public")
   created_at  DateTime @default(now())
-}
-
-model announcements {
-  id                 String               @id @default(uuid())
-  title              String
-  content            String               @db.Text
-  author_id          String
-  author             profiles             @relation(fields: [author_id], references: [id])
-  priority           String               @default("normal")
-  is_pinned          Boolean              @default(false)
-  valid_until        DateTime?
-  created_at         DateTime             @default(now())
-  updated_at         DateTime             @updatedAt
-  announcement_reads announcement_reads[]
-}
-
-model announcement_reads {
-  id              String        @id @default(uuid())
-  announcement_id String
-  announcement    announcements @relation(fields: [announcement_id], references: [id])
-  employee_id     String
-  employee        profiles      @relation(fields: [employee_id], references: [id])
-  read_at         DateTime      @default(now())
-
-  @@unique([announcement_id, employee_id])
 }
 
 model audit_logs {

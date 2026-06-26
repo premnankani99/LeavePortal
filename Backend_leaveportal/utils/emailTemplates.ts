@@ -77,6 +77,39 @@ export const leaveStatusUpdateTemplate = (employeeName: string, startDate: strin
     `;
 };
 
+export const getOtpEmailTemplate = (fullName: string, otp: string) => {
+  return `
+    <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 10px;">
+      <h2 style="color: #7e57c2; text-align: center;">Verify Your Email</h2>
+      <p>Hi ${fullName},</p>
+      <p>Welcome to the Leave Portal! Please use the OTP below to verify your email address. This OTP is valid for 10 minutes.</p>
+      <div style="background-color: #f4f4f4; padding: 15px; text-align: center; border-radius: 5px; font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #333; margin: 20px 0;">
+        ${otp}
+      </div>
+      <p>If you did not create an account, you can safely ignore this email.</p>
+      <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
+      <p style="font-size: 12px; color: #888; text-align: center;">This is an automated message, please do not reply.</p>
+    </div>
+  `;
+};
+
+export const getResetPasswordEmailTemplate = (fullName: string, otp: string) => {
+  return `
+    <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 10px;">
+      <h2 style="color: #7e57c2; text-align: center;">Reset Your Password</h2>
+      <p>Hi ${fullName},</p>
+      <p>We received a request to reset your password for the Leave Portal. Please use the OTP below to complete the process. This OTP is valid for 10 minutes.</p>
+      <div style="background-color: #f4f4f4; padding: 15px; text-align: center; border-radius: 5px; font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #333; margin: 20px 0;">
+        ${otp}
+      </div>
+      <p>If you did not request a password reset, you can safely ignore this email.</p>
+      <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
+      <p style="font-size: 12px; color: #888; text-align: center;">This is an automated message, please do not reply.</p>
+    </div>
+  `;
+};
+
+
 export const leaveWithdrawalAdminTemplate = (employeeName: string, startDate: string, endDate: string, message: string) => `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
     <h2 style="color: #f39c12;">Leave Withdrawal Request</h2>

@@ -29,11 +29,14 @@ export const useRegisterForm = () => {
     setLoading(true);
     
     try {
-      const { error, data } = await register(fullName, email, password);
+      const { error, requireOtp } = await register(fullName, email, password);
 
       if (error) {
         toast.error(error);
         console.error("SignUp Error:", error);
+      } else if (requireOtp) {
+        toast.success("Registration successful! Please verify your email.");
+        navigate(`/verify-otp?email=${encodeURIComponent(email)}`);
       } else {
         toast.success("Registration successful! Waiting for Admin verification.");
         // Auto redirect to home after 1 second

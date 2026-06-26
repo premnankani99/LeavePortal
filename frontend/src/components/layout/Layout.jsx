@@ -155,13 +155,11 @@ export default function Layout({ children }) {
                isActive('/admin') ? 'Admin Dashboard' : 
                isActive('/admin/leave-queue') ? 'Leave Approval Queue' : 
                isActive('/admin/verification-queue') ? 'Verification Queue' : 
-               isActive('/admin/announcements') ? 'Announcements' : 
                isActive('/admin/employees') ? 'Employee Directory' : 
                isActive('/leaves') ? 'Leave History' : 
                isActive('/apply-leave') ? 'Apply for Leave' : 
                isActive('/profile') ? 'My Profile' : 
-               isActive('/notifications') ? 'Notifications' : 
-               isActive('/announcements') ? 'Announcements Feed' : 'Settings'}
+               isActive('/notifications') ? 'Notifications' : 'Settings'}
             </h1>
           </div>
 

@@ -27,7 +27,14 @@ export const useLoginForm = () => {
     e.preventDefault();
     setLoading(true);
     
-    const { error } = await login(email, password);
+    const { error, requireOtp } = await login(email, password);
+
+    if (requireOtp) {
+      toast.error("Email not verified. A new OTP has been sent to your email.");
+      navigate(`/verify-otp?email=${encodeURIComponent(email)}`);
+      setLoading(false);
+      return;
+    }
 
     if (error) {
       toast.error(error);

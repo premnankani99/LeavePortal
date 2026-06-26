@@ -160,8 +160,8 @@ export const useUpdateVerification = () => {
   return useMutation({
     mutationFn: async ({ userId, status }) => {
       const backendStatus = status === 'verified' ? 'approved' : 'rejected';
-      const res = await fetch(`${API_BASE_URL}/api/admin/verify/${userId}`, {
-        method: 'PUT',
+      const res = await fetch(`${API_BASE_URL}/api/admin/verification/${userId}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: backendStatus })
       });

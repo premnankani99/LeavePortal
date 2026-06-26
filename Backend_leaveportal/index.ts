@@ -4,8 +4,6 @@ import { sendEmail } from './utils/emailService';
 import authRoutes from './routes/auth';
 import leaveRoutes from './routes/leaves';
 import adminRoutes from './routes/admin';
-import announcementRoutes from './routes/announcements';
-
 const app = express();
 const PORT = 5000;
 
@@ -41,11 +39,10 @@ app.get('/api/test-email', async (req: Request, res: Response) => {
     }
 });
 
-// Nayi API Route (Login aur Register ke liye)
 app.use('/api/auth', authRoutes);
 app.use('/api/leaves', leaveRoutes);
 app.use('/api/admin', adminRoutes);
-// app.use('/api/announcements', announcementRoutes);
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
