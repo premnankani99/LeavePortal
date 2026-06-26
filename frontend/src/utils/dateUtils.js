@@ -28,6 +28,8 @@ export const calculateMultiDateBreakdown = (selectedDates, availablePaidLeaves, 
     let dateStr = "";
     if (typeof dateObj === 'string') {
       dateStr = dateObj;
+    } else if (dateObj instanceof Date) {
+      dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
     } else if (dateObj && typeof dateObj.format === 'function') {
       dateStr = dateObj.format("YYYY-MM-DD");
     } else {

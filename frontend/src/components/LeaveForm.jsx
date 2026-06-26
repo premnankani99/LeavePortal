@@ -18,7 +18,8 @@ export default function LeaveForm({ onSuccess }) {
     onSubmit,
     isSubmitting,
     isHalfDay,
-    selectedSession
+    selectedSession,
+    myLeaves
   } = useLeaveForm(onSuccess);
 
   if (loadingTypes) {
@@ -54,6 +55,7 @@ export default function LeaveForm({ onSuccess }) {
             control={control} 
             isHalfDay={isHalfDay} 
             errors={errors} 
+            myLeaves={myLeaves}
           />
 
           {isHalfDay && (

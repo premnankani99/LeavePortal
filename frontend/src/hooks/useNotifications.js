@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Bell, CheckCircle2, XCircle, RefreshCcw, AlertCircle } from 'lucide-react';
 import { useMyRequests, useAllRequests, usePendingVerifications } from './useLeaves';
 import { useAuth } from '../context/AuthContext';
@@ -26,10 +26,20 @@ export const useNotifications = () => {
   const { data: allRequests = [], isLoading: loadingAll } = useAllRequests();
   const { data: pendingVerifications = [], isLoading: loadingVerif } = usePendingVerifications();
 
+  const [lastReadTime, setLastReadTime] = useState(() => {
+    return user ? Number(localStorage.getItem(`notif_read_${user.id}`) || '0') : 0;
+  });
+
+  useEffect(() => {
+    const updateRead = () => {
+      setLastReadTime(user ? Number(localStorage.getItem(`notif_read_${user.id}`) || '0') : 0);
+    };
+    window.addEventListener('notifications_read', updateRead);
+    return () => window.removeEventListener('notifications_read', updateRead);
+  }, [user]);
+
   const notificationsList = useMemo(() => {
     const notifs = [];
-    const lastReadStr = user ? localStorage.getItem(`notif_read_${user.id}`) : '0';
-    const lastReadTime = Number(lastReadStr || '0');
 
     if (role === 'admin') {
       // 1. Pending Leave Requests
@@ -161,7 +171,7 @@ export const useNotifications = () => {
 
     // Sort by newest first
     return notifs.sort((a, b) => b.timeDate - a.timeDate);
-  }, [myLeaves, allRequests, pendingVerifications, role, user]);
+  }, [myLeaves, allRequests, pendingVerifications, role, user, lastReadTime]);
 
   return {
     notificationsList,

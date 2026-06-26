@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { leaveSchema } from '../utils/leaveValidation';
@@ -39,6 +39,36 @@ export const useLeaveForm = (onSuccess) => {
 
   const allowedTypes = leaveTypes.filter(t => t.name.includes('Casual') || t.name.includes('Sick'));
 
+  // Expand range dates
+  const expandedDates = useMemo(() => {
+    if (!selectedDates || selectedDates.length === 0) return [];
+    
+    if (isHalfDay || selectedDates.length === 1) {
+      return [...selectedDates];
+    }
+    
+    const start = selectedDates[0];
+    const end = selectedDates[1];
+    
+    const getJsDate = (d) => {
+      if (d instanceof Date) return d;
+      if (typeof d === 'string') return new Date(d);
+      if (d && typeof d.format === 'function') return new Date(d.format("YYYY-MM-DD"));
+      return new Date(`${d.year}-${String(d.month.number).padStart(2, '0')}-${String(d.day).padStart(2, '0')}`);
+    };
+    
+    const startDate = getJsDate(start);
+    const endDate = getJsDate(end);
+    
+    const dates = [];
+    let currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      dates.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dates;
+  }, [selectedDates, isHalfDay]);
+
   // If switched to Half Day, enforce single date selection
   useEffect(() => {
     if (isHalfDay && selectedDates && selectedDates.length > 1) {
@@ -47,7 +77,7 @@ export const useLeaveForm = (onSuccess) => {
   }, [isHalfDay, selectedDates, setValue]);
 
   useEffect(() => {
-    if (selectedDates && selectedDates.length > 0) {
+    if (expandedDates && expandedDates.length > 0) {
       // Calculate probation and available paid leaves
       const joinedDate = new Date(profile?.created_at || new Date());
       const now = new Date();
@@ -72,7 +102,7 @@ export const useLeaveForm = (onSuccess) => {
         availablePaid = Math.max(0, 1 - daysTakenThisMonth);
       }
       
-      const breakdown = calculateMultiDateBreakdown(selectedDates, availablePaid, isHalfDay, isCompensatory);
+      const breakdown = calculateMultiDateBreakdown(expandedDates, availablePaid, isHalfDay, isCompensatory);
       
       // Also add probation warning to breakdown
       breakdown.inProbation = monthsSinceJoining < 6;
@@ -80,10 +110,10 @@ export const useLeaveForm = (onSuccess) => {
     } else {
       setLeaveBreakdown(null);
     }
-  }, [selectedDates, selectedTypeId, myLeaves, profile, isHalfDay, isCompensatory]);
+  }, [expandedDates, selectedTypeId, myLeaves, profile, isHalfDay, isCompensatory]);
 
   const onSubmit = (data) => {
-    const formattedDates = data.dates.map(d => {
+    const formattedDates = expandedDates.map(d => {
       if (typeof d === 'string') return d;
       if (d && typeof d.format === 'function') return d.format("YYYY-MM-DD");
       if (d instanceof Date) return d.toISOString().split('T')[0];
@@ -124,6 +154,7 @@ export const useLeaveForm = (onSuccess) => {
     onSubmit,
     isSubmitting: createRequest.isPending,
     isHalfDay,
-    selectedSession
+    selectedSession,
+    myLeaves
   };
 };

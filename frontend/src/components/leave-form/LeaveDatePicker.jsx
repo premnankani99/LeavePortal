@@ -6,7 +6,23 @@ import { COMPANY_HOLIDAYS, HOLIDAY_NAMES } from '../../utils/dateUtils';
 // A custom class for styling the Multi-Date Picker input via Tailwind instead of inline styles
 const inputClass = "w-full py-2.5 px-3.5 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-[#7e57c2] focus:border-[#7e57c2]";
 
-export default function LeaveDatePicker({ control, isHalfDay, errors }) {
+export default function LeaveDatePicker({ control, isHalfDay, errors, myLeaves = [] }) {
+  const now = new Date();
+  const maxDate = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+
+  const appliedDates = new Set();
+  myLeaves.forEach(leave => {
+    if (leave.status === 'rejected' || leave.status === 'cancelled' || leave.status === 'withdrawn') return;
+    
+    let currentDate = new Date(leave.start_date);
+    const end = new Date(leave.end_date);
+    while (currentDate <= end) {
+      const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+      appliedDates.add(dateStr);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  });
+
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">Select date{isHalfDay ? '' : '(s)'}</label>
@@ -15,11 +31,13 @@ export default function LeaveDatePicker({ control, isHalfDay, errors }) {
         control={control}
         render={({ field }) => (
           <DatePicker 
-            multiple={!isHalfDay} 
+            range={!isHalfDay}
+            rangeHover={!isHalfDay}
             value={field.value} 
             onChange={field.onChange} 
             format="YYYY-MM-DD"
             minDate={new Date()}
+            maxDate={maxDate}
             inputClass={inputClass}
             containerClassName="w-full"
             calendarPosition="bottom-left"
@@ -30,9 +48,17 @@ export default function LeaveDatePicker({ control, isHalfDay, errors }) {
               const dayOfWeek = jsDate.getDay();
               const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
               const isHoliday = COMPANY_HOLIDAYS.includes(dateStr);
+              const isApplied = appliedDates.has(dateStr);
 
               // Instead of returning style objects, we return className strings 
               // for the date-picker cells, fulfilling the "no inline style" requirement.
+              if (isApplied) {
+                return {
+                  disabled: true,
+                  className: "text-red-500 bg-red-50 cursor-not-allowed font-semibold line-through",
+                  title: 'Already applied for leave on this date'
+                };
+              }
               if (isWeekend) {
                 return {
                   disabled: true,
