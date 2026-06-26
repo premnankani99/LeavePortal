@@ -36,7 +36,10 @@ export const useMyRequests = () => {
     queryKey: ['leave_requests', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const res = await fetch(`${API_BASE_URL}/api/leaves/my-leaves/${user.id}`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/leaves/my-leaves`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (!res.ok) throw new Error("Failed to fetch leaves");
       const data = await res.json();
       // Map to frontend structure
@@ -45,7 +48,8 @@ export const useMyRequests = () => {
         leave_types: { name: req.leave_type }
       }));
     },
-    enabled: !!user
+    enabled: !!user,
+    refetchInterval: 5000
   });
 };
 
@@ -55,9 +59,13 @@ export const useCreateRequest = () => {
 
   return useMutation({
     mutationFn: async (requestData) => {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/api/leaves/apply`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           ...requestData,
           employee_id: user.id,
@@ -69,6 +77,7 @@ export const useCreateRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leave_requests', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['admin_all_requests'] });
     }
   });
 };
@@ -79,9 +88,13 @@ export const useWithdrawRequest = () => {
 
   return useMutation({
     mutationFn: async ({ requestId, datesToWithdraw }) => {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/api/leaves/withdraw/${requestId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ datesToWithdraw })
       });
       if (!res.ok) throw new Error("Failed to withdraw");
@@ -89,6 +102,7 @@ export const useWithdrawRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leave_requests', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['admin_all_requests'] });
     }
   });
 };
@@ -101,7 +115,10 @@ export const useAllRequests = () => {
   return useQuery({
     queryKey: ['admin_all_requests'],
     queryFn: async () => {
-      const res = await fetch(`${API_BASE_URL}/api/leaves/all`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/leaves/all`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (!res.ok) throw new Error("Failed to fetch all leaves");
       const data = await res.json();
       return data.map(req => ({
@@ -109,7 +126,8 @@ export const useAllRequests = () => {
         profiles: req.employee || { full_name: 'Unknown', email: 'N/A' },
         leave_types: { name: req.leave_type }
       }));
-    }
+    },
+    refetchInterval: 5000
   });
 };
 
@@ -118,9 +136,13 @@ export const useUpdateRequestStatus = () => {
 
   return useMutation({
     mutationFn: async ({ requestId, newStatus, adminNote }) => {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/api/leaves/status/${requestId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
         body: JSON.stringify({ status: newStatus, adminNote })
       });
       if (!res.ok) throw new Error("Failed to update status");
@@ -137,10 +159,14 @@ export const usePendingVerifications = () => {
   return useQuery({
     queryKey: ['admin_pending_verifications'],
     queryFn: async () => {
-      const res = await fetch(`${API_BASE_URL}/api/admin/pending`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/admin/pending`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (!res.ok) throw new Error("Failed to fetch pending verifications");
       return res.json();
-    }
+    },
+    refetchInterval: 5000
   });
 };
 
@@ -148,10 +174,14 @@ export const useVerifiedEmployees = () => {
   return useQuery({
     queryKey: ['admin_verified_employees'],
     queryFn: async () => {
-      const res = await fetch(`${API_BASE_URL}/api/admin/verified`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/admin/verified`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (!res.ok) throw new Error("Failed to fetch verified employees");
       return res.json();
-    }
+    },
+    refetchInterval: 5000
   });
 };
 
@@ -159,10 +189,14 @@ export const useUpdateVerification = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ userId, status }) => {
+      const token = localStorage.getItem('token');
       const backendStatus = status === 'verified' ? 'approved' : 'rejected';
       const res = await fetch(`${API_BASE_URL}/api/admin/verification/${userId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
         body: JSON.stringify({ status: backendStatus })
       });
       if (!res.ok) throw new Error("Failed to update verification");

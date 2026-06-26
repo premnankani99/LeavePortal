@@ -10,19 +10,19 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 
+import { HTTP_STATUS } from './constants/httpCodes';
+
 // Test API Route
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (_req: Request, res: Response) => {
     res.send("Backend API is running in TypeScript!");
 });
 
 // Test Email API
 app.get('/api/test-email', async (req: Request, res: Response) => {
-    // You can customize the receiver by passing ?email=your@email.com in the URL
-    // Otherwise it defaults to the ADMIN_EMAIL in .env
     const receiverEmail = req.query.email as string || process.env.ADMIN_EMAIL;
     
     if (!receiverEmail) {
-        res.status(400).json({ error: "No email provided. Please add ?email=receiver@example.com to the URL or set ADMIN_EMAIL in .env" });
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "No email provided." });
         return;
     }
     
@@ -33,9 +33,9 @@ app.get('/api/test-email', async (req: Request, res: Response) => {
     });
 
     if (success) {
-        res.status(200).json({ message: `Test email sent successfully to ${receiverEmail}! Please check your inbox.` });
+        res.status(HTTP_STATUS.OK).json({ message: `Test email sent successfully to ${receiverEmail}! Please check your inbox.` });
     } else {
-        res.status(500).json({ error: "Failed to send email. Please check your terminal for errors and verify your .env credentials." });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to send email." });
     }
 });
 

@@ -22,8 +22,10 @@ export const useAdminEmployees = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/api/admin/employee/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to delete employee');
       return res.json();
@@ -36,10 +38,12 @@ export const useAdminEmployees = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }) => {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/api/admin/employee/${id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)
       });

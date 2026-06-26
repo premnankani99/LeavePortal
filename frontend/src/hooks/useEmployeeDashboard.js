@@ -12,9 +12,12 @@ export function useEmployeeDashboard() {
     if (!user?.id) return;
     
     // Fetch profile
-    fetch(`${API_BASE_URL}/api/auth/profile/${user.id}`)
+    const token = localStorage.getItem('token');
+    fetch(`${API_BASE_URL}/api/auth/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
       .then(res => res.json())
-      .then(data => setProfile(data))
+      .then(data => setProfile(data.user))
       .catch(err => console.error(err));
   }, [user]);
 

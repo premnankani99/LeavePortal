@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState('pending');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,9 +20,30 @@ export const AuthProvider = ({ children }) => {
       setUser(parsedUser);
       setRole(parsedUser.role);
       setIsVerified(parsedUser.verification_status === 'approved');
+      setVerificationStatus(parsedUser.verification_status || 'pending');
     }
     setLoading(false);
   }, []);
+
+  const refreshUser = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const { user: updatedUser } = await response.json();
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        setRole(updatedUser.role);
+        setIsVerified(updatedUser.verification_status === 'approved');
+        setVerificationStatus(updatedUser.verification_status || 'pending');
+      }
+    } catch (err) {
+      console.error('Failed to refresh user:', err);
+    }
+  };
 
   const login = async (email, password) => {
     try {
@@ -46,6 +68,7 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       setRole(data.user.role);
       setIsVerified(data.user.verification_status === 'approved');
+      setVerificationStatus(data.user.verification_status || 'pending');
 
       return { data, error: null, requireOtp: false };
     } catch (error) {
@@ -75,6 +98,7 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       setRole(data.user.role);
       setIsVerified(data.user.verification_status === 'approved');
+      setVerificationStatus(data.user.verification_status || 'pending');
 
       return { data, error: null, requireOtp: false };
     } catch (error) {
@@ -97,6 +121,7 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       setRole(data.user.role);
       setIsVerified(data.user.verification_status === 'approved');
+      setVerificationStatus(data.user.verification_status || 'pending');
 
       return { error: null };
     } catch (error) {
@@ -140,10 +165,11 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setRole(null);
     setIsVerified(false);
+    setVerificationStatus('pending');
   };
 
   return (
-    <AuthContext.Provider value={{ user, role, isVerified, loading, login, register, verifyOtp, forgotPassword, resetPassword, logout }}>
+    <AuthContext.Provider value={{ user, role, isVerified, verificationStatus, loading, login, register, verifyOtp, forgotPassword, resetPassword, logout, refreshUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

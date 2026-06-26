@@ -1,7 +1,15 @@
 import { Request, Response } from 'express';
-import prisma from '../prismaClient'; // Trigger TS re-check
+import prisma from '../prismaClient';
+import { MESSAGES } from '../constants/strings';
+import { HTTP_STATUS } from '../constants/httpCodes';
 
-export const getPendingVerifications = async (req: Request, res: Response): Promise<void> => {
+/**
+ * Fetches all pending employee verification requests.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<void>} Resolves when the response is sent.
+ */
+export const getPendingVerifications = async (_req: Request, res: Response): Promise<void> => {
     try {
         const pending = await prisma.profiles.findMany({
             where: { 
@@ -10,13 +18,19 @@ export const getPendingVerifications = async (req: Request, res: Response): Prom
             },
             orderBy: { created_at: 'desc' }
         });
-        res.status(200).json(pending);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch pending verifications" });
+        res.status(HTTP_STATUS.OK).json(pending);
+    } catch (_error) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.FETCH_ERROR });
     }
 };
 
-export const getVerifiedEmployees = async (req: Request, res: Response): Promise<void> => {
+/**
+ * Fetches all verified employees.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<void>} Resolves when the response is sent.
+ */
+export const getVerifiedEmployees = async (_req: Request, res: Response): Promise<void> => {
     try {
         const verified = await prisma.profiles.findMany({
             where: { 
@@ -26,16 +40,22 @@ export const getVerifiedEmployees = async (req: Request, res: Response): Promise
             },
             orderBy: { full_name: 'asc' }
         });
-        res.status(200).json(verified);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch verified employees" });
+        res.status(HTTP_STATUS.OK).json(verified);
+    } catch (_error) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.FETCH_ERROR });
     }
 };
 
+/**
+ * Updates the verification status of an employee.
+ * @param {Request} req - The Express request object containing status in body.
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<void>} Resolves when the response is sent.
+ */
 export const updateVerificationStatus = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const { status } = req.body; // 'approved' or 'rejected'
+        const { status } = req.body; 
 
         const updatedProfile = await prisma.profiles.update({
             where: { id: String(id) },
@@ -45,14 +65,18 @@ export const updateVerificationStatus = async (req: Request, res: Response): Pro
             }
         });
 
-        // Removed Audit Log generation
-
-        res.status(200).json({ message: "Verification status updated", profile: updatedProfile });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to update verification status" });
+        res.status(HTTP_STATUS.OK).json({ message: MESSAGES.VERIFICATION_UPDATED, profile: updatedProfile });
+    } catch (_error) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.UPDATE_ERROR });
     }
 };
 
+/**
+ * Soft deletes an employee profile.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<void>} Resolves when the response is sent.
+ */
 export const deleteEmployee = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
@@ -62,12 +86,18 @@ export const deleteEmployee = async (req: Request, res: Response): Promise<void>
             data: { is_deleted: true }
         });
 
-        res.status(200).json({ message: "Employee soft-deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to remove employee" });
+        res.status(HTTP_STATUS.OK).json({ message: MESSAGES.EMPLOYEE_DELETED });
+    } catch (_error) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.DELETE_ERROR });
     }
 };
 
+/**
+ * Updates an employee's details.
+ * @param {Request} req - The Express request object containing updated fields.
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<void>} Resolves when the response is sent.
+ */
 export const updateEmployee = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
@@ -75,17 +105,11 @@ export const updateEmployee = async (req: Request, res: Response): Promise<void>
 
         const updatedProfile = await prisma.profiles.update({
             where: { id: String(id) },
-            data: {
-                full_name,
-                email,
-                phone,
-                designation,
-                role
-            }
+            data: { full_name, email, phone, designation, role }
         });
 
-        res.status(200).json({ message: "Employee updated successfully", profile: updatedProfile });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to update employee" });
+        res.status(HTTP_STATUS.OK).json({ message: MESSAGES.EMPLOYEE_UPDATED, profile: updatedProfile });
+    } catch (_error) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.UPDATE_ERROR });
     }
 };

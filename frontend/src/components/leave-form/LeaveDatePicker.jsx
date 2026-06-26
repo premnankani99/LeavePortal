@@ -34,12 +34,24 @@ export default function LeaveDatePicker({ control, isHalfDay, errors, myLeaves =
             range={!isHalfDay}
             rangeHover={!isHalfDay}
             value={field.value} 
-            onChange={field.onChange} 
+            onChange={(dates) => {
+              // If user clicks the same date twice in range mode, it sets start and end to the same date.
+              // We intercept this and clear the selection instead, to simulate "deselect".
+              if (Array.isArray(dates) && dates.length === 2) {
+                const start = dates[0];
+                const end = dates[1];
+                if (start && end && start.format("YYYY-MM-DD") === end.format("YYYY-MM-DD")) {
+                  field.onChange([]); // Clear the selection
+                  return;
+                }
+              }
+              field.onChange(dates);
+            }}
             format="YYYY-MM-DD"
             minDate={new Date()}
             maxDate={maxDate}
             inputClass={inputClass}
-            containerClassName="w-full"
+            containerClassName="w-full sm:w-1/2"
             calendarPosition="bottom-left"
             fixMainPosition
             mapDays={({ date }) => {
@@ -50,8 +62,6 @@ export default function LeaveDatePicker({ control, isHalfDay, errors, myLeaves =
               const isHoliday = COMPANY_HOLIDAYS.includes(dateStr);
               const isApplied = appliedDates.has(dateStr);
 
-              // Instead of returning style objects, we return className strings 
-              // for the date-picker cells, fulfilling the "no inline style" requirement.
               if (isApplied) {
                 return {
                   disabled: true,

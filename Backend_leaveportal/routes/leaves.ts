@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { applyLeave, getMyLeaves, getAllLeaves, updateLeaveStatus, withdrawLeave } from '../controllers/leaves';
+import { verifyToken, isAdmin } from '../middleware/auth';
 
 const router = Router();
 
-router.post('/apply', applyLeave);
-router.get('/my-leaves/:employee_id', getMyLeaves);
-router.get('/all', getAllLeaves);
-router.put('/status/:id', updateLeaveStatus);
-router.put('/withdraw/:id', withdrawLeave);
+router.post('/apply', verifyToken, applyLeave as any);
+router.get('/my-leaves', verifyToken, getMyLeaves as any);
+router.get('/all', verifyToken, isAdmin, getAllLeaves as any);
+router.put('/status/:id', verifyToken, isAdmin, updateLeaveStatus as any);
+router.put('/withdraw/:id', verifyToken, withdrawLeave as any);
 
 export default router;

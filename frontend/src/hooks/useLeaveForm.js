@@ -43,6 +43,7 @@ export const useLeaveForm = (onSuccess) => {
   const expandedDates = useMemo(() => {
     if (!selectedDates || selectedDates.length === 0) return [];
     
+    // If only one date is selected, it acts as both start and end date
     if (isHalfDay || selectedDates.length === 1) {
       return [...selectedDates];
     }
@@ -51,6 +52,7 @@ export const useLeaveForm = (onSuccess) => {
     const end = selectedDates[1];
     
     const getJsDate = (d) => {
+      if (!d) return null;
       if (d instanceof Date) return d;
       if (typeof d === 'string') return new Date(d);
       if (d && typeof d.format === 'function') return new Date(d.format("YYYY-MM-DD"));
@@ -58,7 +60,7 @@ export const useLeaveForm = (onSuccess) => {
     };
     
     const startDate = getJsDate(start);
-    const endDate = getJsDate(end);
+    const endDate = getJsDate(end) || new Date(startDate);
     
     const dates = [];
     let currentDate = new Date(startDate);

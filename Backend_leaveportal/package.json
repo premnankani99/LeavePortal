@@ -4,7 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --ext .js,.ts",
+    "lint:fix": "eslint . --ext .js,.ts --fix",
+    "prepare": "husky install",
+    "update-docs-commit": "node scripts/update-docs-commit.js"
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -30,6 +39,12 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.0.0",
     "@types/nodemailer": "^8.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.62.0",
+    "@typescript-eslint/parser": "^8.62.0",
+    "eslint": "^10.5.0",
+    "eslint-plugin-jsdoc": "^63.0.9",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   }
