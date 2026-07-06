@@ -64,7 +64,7 @@ export const useHolidays = () => {
     }
   });
 
-  const isHolidayAdmin = user?.role === 'admin' || user?.role === 'hr';
+  const isHolidayAdmin = user?.role === 'admin' || user?.role?.toLowerCase() === 'hr';
 
   return {
     currentYear,

@@ -118,7 +118,7 @@ export const useWithdrawRequest = () => {
 // ==========================================
 
 export const useAllRequests = () => {
-  const { user } = useAuth();
+  const { role } = useAuth();
   return useQuery({
     queryKey: ['admin_all_requests'],
     queryFn: async () => {
@@ -134,7 +134,7 @@ export const useAllRequests = () => {
         leave_types: { name: req.leave_type }
       }));
     },
-    enabled: user?.role === 'admin' || user?.role === 'hr',
+    enabled: role === 'admin' || role?.toLowerCase() === 'hr',
     refetchInterval: 5000
   });
 };
@@ -165,7 +165,7 @@ export const useUpdateRequestStatus = () => {
 
 // Admin Verification
 export const usePendingVerifications = () => {
-  const { user } = useAuth();
+  const { role } = useAuth();
   return useQuery({
     queryKey: ['admin_pending_verifications'],
     queryFn: async () => {
@@ -176,13 +176,13 @@ export const usePendingVerifications = () => {
       if (!res.ok) throw new Error("Failed to fetch pending verifications");
       return res.json();
     },
-    enabled: user?.role === 'admin' || user?.role === 'hr',
+    enabled: role === 'admin' || role?.toLowerCase() === 'hr',
     refetchInterval: 5000
   });
 };
 
 export const useVerifiedEmployees = () => {
-  const { user } = useAuth();
+  const { role } = useAuth();
   return useQuery({
     queryKey: ['admin_verified_employees'],
     queryFn: async () => {
@@ -193,7 +193,7 @@ export const useVerifiedEmployees = () => {
       if (!res.ok) throw new Error("Failed to fetch verified employees");
       return res.json();
     },
-    enabled: user?.role === 'admin' || user?.role === 'hr',
+    enabled: role === 'admin' || role?.toLowerCase() === 'hr',
     refetchInterval: 10000
   });
 };

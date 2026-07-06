@@ -20,11 +20,12 @@ export const useAdminDashboardStats = () => {
       return today.isAfter(dayjs(r.start_date).subtract(1, 'day')) && today.isBefore(dayjs(r.end_date).add(1, 'day'));
     }).length;
 
+    const isHr = role?.toLowerCase() === 'hr';
     const kpis = [
-      { title: 'Active Employees', value: verifiedEmployees.length, icon: Users, iconColor: 'text-[#7e57c2]', iconBg: 'bg-purple-100', sub: `+${pendingVerifs.length} pending`, path: role === 'hr' ? '/hr/employees' : '/admin/employees' },
-      { title: 'On Leave Today', value: onLeaveToday, icon: Briefcase, iconColor: 'text-[#7e57c2]', iconBg: 'bg-purple-100', sub: 'currently away', path: role === 'hr' ? '/hr/leaves' : '/admin/leave-queue' },
-      { title: 'Pending Approvals', value: pendingRequests.length, icon: Clock, iconColor: 'text-amber-600', iconBg: 'bg-amber-100', sub: 'awaiting action', path: role === 'hr' ? '/hr/leaves' : '/admin/leave-queue' },
-      { title: 'Total Requests', value: allRequests.length, icon: FileText, iconColor: 'text-emerald-600', iconBg: 'bg-emerald-100', sub: `${approvedRequests.length} approved`, path: role === 'hr' ? '/hr/leaves' : '/admin/leave-queue' },
+      { title: 'Active Employees', value: verifiedEmployees.length, icon: Users, iconColor: 'text-[#7e57c2]', iconBg: 'bg-purple-100', sub: `+${pendingVerifs.length} pending`, path: isHr ? '/hr/employees' : '/admin/employees' },
+      { title: 'On Leave Today', value: onLeaveToday, icon: Briefcase, iconColor: 'text-[#7e57c2]', iconBg: 'bg-purple-100', sub: 'currently away', path: isHr ? '/hr/leaves' : '/admin/leave-queue' },
+      { title: 'Pending Approvals', value: pendingRequests.length, icon: Clock, iconColor: 'text-amber-600', iconBg: 'bg-amber-100', sub: 'awaiting action', path: isHr ? '/hr/leaves' : '/admin/leave-queue' },
+      { title: 'Total Requests', value: allRequests.length, icon: FileText, iconColor: 'text-emerald-600', iconBg: 'bg-emerald-100', sub: `${approvedRequests.length} approved`, path: isHr ? '/hr/leaves' : '/admin/leave-queue' },
     ];
 
     return {

@@ -44,7 +44,9 @@ export const useNotifications = () => {
   const notificationsList = useMemo(() => {
     const notifs = [];
 
-    if (role === 'admin' || role === 'hr') {
+    const isHr = role?.toLowerCase() === 'hr';
+
+    if (role === 'admin' || isHr) {
       // 1. Pending Leave Requests
       allRequests.forEach(leave => {
         const type = leave.leave_types?.name || 'Leave';
@@ -62,7 +64,7 @@ export const useNotifications = () => {
             icon: Bell,
             iconBg: 'bg-purple-100 text-[#7e57c2]',
             isUnread: tDate.getTime() > lastReadTime,
-            link: '/admin/leave-queue'
+            link: isHr ? '/hr/leaves' : '/admin/leave-queue'
           });
         }
 
@@ -78,7 +80,7 @@ export const useNotifications = () => {
             icon: AlertCircle,
             iconBg: 'bg-orange-100 text-orange-600',
             isUnread: tDate.getTime() > lastReadTime,
-            link: '/admin/leave-queue'
+            link: isHr ? '/hr/leaves' : '/admin/leave-queue'
           });
         }
       });
@@ -95,7 +97,7 @@ export const useNotifications = () => {
           icon: AlertCircle,
           iconBg: 'bg-yellow-100 text-yellow-600',
           isUnread: tDate.getTime() > lastReadTime,
-          link: '/admin/verification-queue'
+          link: isHr ? '/hr/employees' : '/admin/verification-queue'
         });
       });
 
@@ -111,7 +113,7 @@ export const useNotifications = () => {
           icon: Gift,
           iconBg: 'bg-blue-100 text-blue-600',
           isUnread: tDate.getTime() > lastReadTime,
-          link: '/admin/comp-off'
+          link: isHr ? '/hr/dashboard' : '/admin/comp-off'
         });
       });
 

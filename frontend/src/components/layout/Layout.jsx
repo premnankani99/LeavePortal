@@ -124,8 +124,8 @@ export default function Layout({ children }) {
         
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2">
           
-          <Link to={role === 'admin' ? "/admin" : role === 'hr' ? "/hr/dashboard" : "/"} className={`flex items-center px-4 py-3 rounded-lg transition-all duration-300 text-base font-medium group ${isActive(role === 'admin' ? '/admin' : role === 'hr' ? '/hr/dashboard' : '/') ? 'bg-[#7e57c2] text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
-            <LayoutDashboard className={`w-5 h-5 mr-3 transition-transform duration-300 ${!isActive(role === 'admin' ? '/admin' : role === 'hr' ? '/hr/dashboard' : '/') && 'group-hover:translate-x-1'}`} />
+          <Link to={role === 'admin' ? "/admin" : role?.toLowerCase() === 'hr' ? "/hr/dashboard" : "/"} className={`flex items-center px-4 py-3 rounded-lg transition-all duration-300 text-base font-medium group ${isActive(role === 'admin' ? '/admin' : role?.toLowerCase() === 'hr' ? '/hr/dashboard' : '/') ? 'bg-[#7e57c2] text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
+            <LayoutDashboard className={`w-5 h-5 mr-3 transition-transform duration-300 ${!isActive(role === 'admin' ? '/admin' : role?.toLowerCase() === 'hr' ? '/hr/dashboard' : '/') && 'group-hover:translate-x-1'}`} />
             Dashboard
           </Link>
 
@@ -190,7 +190,7 @@ export default function Layout({ children }) {
             </>
           )}
 
-          {role === 'hr' && (
+          {role?.toLowerCase() === 'hr' && (
             <>
               <Link to="/hr/employees" className={`flex items-center px-4 py-3 rounded-lg transition-all duration-300 text-base font-medium group ${isActive('/hr/employees') ? 'bg-[#7e57c2] text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
                 <Users className={`w-5 h-5 mr-3 shrink-0 transition-transform duration-300 ${!isActive('/hr/employees') && 'group-hover:translate-x-1'}`} />

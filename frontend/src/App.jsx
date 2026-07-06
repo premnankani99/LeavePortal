@@ -41,7 +41,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if (allowedRoles && !allowedRoles.includes(role)) {
     // Fallback redirects based on role
-    if (role === 'hr') return <Navigate to="/hr/dashboard" replace />;
+    if (role?.toLowerCase() === 'hr') return <Navigate to="/hr/dashboard" replace />;
     if (role === 'admin') return <Navigate to="/admin" replace />;
     return <Navigate to="/" replace />;
   }
