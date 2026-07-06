@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
+import { Eye } from 'lucide-react';
+import LeaveDetailsModal from './LeaveDetailsModal';
 
 const formatTime = (dateString) => {
   if (!dateString) return null;
@@ -7,8 +10,10 @@ const formatTime = (dateString) => {
 };
 
 export default function ProcessedHistory({ processedRequests }) {
+  const [selectedRequest, setSelectedRequest] = useState(null);
+
   return (
-    <div className="mt-8">
+    <div className="mt-8 relative">
       <Card>
         <CardHeader>
           <CardTitle>Processed Leave History</CardTitle>
@@ -20,15 +25,15 @@ export default function ProcessedHistory({ processedRequests }) {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 text-gray-600">
+              <table className="w-full text-base text-left">
+                <thead className="bg-gray-50 text-gray-500 border-b border-gray-100">
                   <tr>
-                    <th className="px-4 py-3 rounded-tl-md">Employee</th>
-                    <th className="px-4 py-3">Leave Type</th>
-                    <th className="px-4 py-3">Dates</th>
-                    <th className="px-4 py-3">Timings</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3 rounded-tr-md">Comment</th>
+                    <th className="px-5 py-4 font-semibold text-sm uppercase tracking-wide text-center">Employee</th>
+                    <th className="px-5 py-4 font-semibold text-sm uppercase tracking-wide text-center">Leave Type</th>
+                    <th className="px-5 py-4 font-semibold text-sm uppercase tracking-wide text-center">Dates</th>
+                    <th className="px-5 py-4 font-semibold text-sm uppercase tracking-wide text-center">Timings</th>
+                    <th className="px-5 py-4 font-semibold text-sm uppercase tracking-wide text-center">Status</th>
+                    <th className="px-5 py-4 font-semibold text-sm uppercase tracking-wide text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -42,29 +47,37 @@ export default function ProcessedHistory({ processedRequests }) {
                     
                     return (
                       <tr key={req.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 font-medium text-gray-900">
+                        <td className="px-5 py-4 font-medium text-gray-900">
                           {req.profiles?.full_name} <br/>
-                          <span className="text-xs text-gray-500 font-normal">{req.profiles?.email}</span>
+                          <span className="text-sm text-gray-500 font-normal">{req.profiles?.email}</span>
                         </td>
-                        <td className="px-4 py-3">{req.leave_types?.name}</td>
-                        <td className="px-4 py-3">
+                        <td className="px-5 py-4">{req.leave_types?.name}</td>
+                        <td className="px-5 py-4">
                           {req.total_days} days <br/>
-                          <span className="text-xs text-gray-400">{datesReq}</span>
+                          <span className="text-sm text-gray-500">{datesReq}</span>
                         </td>
-                        <td className="px-4 py-3 text-[11px] text-gray-500 min-w-[140px]">
-                          <div className="space-y-1">
-                            <div><span className="font-semibold">Applied:</span> {submitDate}</div>
+                        <td className="px-5 py-4 text-sm text-gray-600 min-w-[200px] whitespace-nowrap">
+                          <div className="space-y-1.5 bg-gray-50/50 p-2 rounded border border-gray-100">
+                            <div><span className="font-semibold text-gray-700">Applied:</span> {submitDate}</div>
                             {approvedDate && <div><span className="font-semibold text-emerald-600">Approved:</span> {approvedDate}</div>}
                             {rejectedDate && <div><span className="font-semibold text-red-600">Rejected:</span> {rejectedDate}</div>}
                             {withdrawnDate && <div><span className="font-semibold text-gray-600">Withdrawn:</span> {withdrawnDate}</div>}
                           </div>
                         </td>
-                        <td className="px-4 py-3">
-                          <Badge variant={req.status === 'approved' ? 'success' : req.status === 'rejected' ? 'danger' : 'secondary'}>
+                        <td className="px-5 py-4 text-center">
+                          <Badge className="capitalize" variant={req.status === 'approved' ? 'success' : req.status === 'rejected' ? 'danger' : req.status === 'cancelled' ? 'black' : 'secondary'}>
                             {req.status === 'cancelled' ? 'withdrawn' : req.status}
                           </Badge>
                         </td>
-                        <td className="px-4 py-3 text-gray-600 truncate max-w-xs">{req.admin_note || '-'}</td>
+                        <td className="px-5 py-4 text-center">
+                          <button 
+                            onClick={() => setSelectedRequest(req)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-[#7e57c2] bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-100"
+                          >
+                            <Eye className="w-4 h-4" />
+                            View Details
+                          </button>
+                        </td>
                       </tr>
                     );
                   })}
@@ -74,6 +87,13 @@ export default function ProcessedHistory({ processedRequests }) {
           )}
         </CardContent>
       </Card>
+      
+      {selectedRequest && (
+        <LeaveDetailsModal 
+          request={selectedRequest} 
+          onClose={() => setSelectedRequest(null)} 
+        />
+      )}
     </div>
   );
 }

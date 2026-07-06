@@ -4,28 +4,31 @@ export default function LeaveBreakdownAlert({ leaveBreakdown }) {
   if (!leaveBreakdown) return null;
 
   return (
-    <div className={`border rounded-md p-4 mt-2 ${leaveBreakdown.unpaidLeaves > 0 ? 'bg-orange-50 border-orange-200' : 'bg-[#1e293b] border-[#334155]'}`}>
+    <div className={`border rounded-md p-4 mt-2 ${leaveBreakdown.unpaidLeaves > 0 ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
       <div className="flex items-start">
-        <Info className={`h-5 w-5 mr-2 mt-0.5 shrink-0 ${leaveBreakdown.unpaidLeaves > 0 ? 'text-orange-500' : 'text-[#94a3b8]'}`} />
-        <div className={`text-sm ${leaveBreakdown.unpaidLeaves > 0 ? 'text-orange-800' : 'text-[#cbd5e1]'}`}>
-          <p>This will count as {leaveBreakdown.totalWorkingDays} day{leaveBreakdown.totalWorkingDays !== 1 ? 's' : ''} against your leave balance.</p>
+        <Info className={`h-5 w-5 mr-2 mt-0.5 shrink-0 ${leaveBreakdown.unpaidLeaves > 0 ? 'text-red-500' : 'text-green-500'}`} />
+        <div className={`text-sm ${leaveBreakdown.unpaidLeaves > 0 ? 'text-red-800' : 'text-green-800'}`}>
+          {leaveBreakdown.unpaidLeaves > 0 && leaveBreakdown.paidLeavesUsed > 0 && (
+            <p className="text-red-600 font-semibold">
+              ⚠️ {leaveBreakdown.paidLeavesUsed} day{leaveBreakdown.paidLeavesUsed !== 1 ? 's' : ''} will be deducted from your balance, and the remaining {leaveBreakdown.unpaidLeaves} day{leaveBreakdown.unpaidLeaves !== 1 ? 's' : ''} will be Unpaid (Loss of Pay).
+            </p>
+          )}
+
+          {leaveBreakdown.unpaidLeaves > 0 && leaveBreakdown.paidLeavesUsed === 0 && (
+            <p className="text-red-600 font-semibold">
+              ⚠️ {leaveBreakdown.unpaidLeaves} day{leaveBreakdown.unpaidLeaves !== 1 ? 's' : ''} will be counted as unpaid leave (Loss of Pay).
+            </p>
+          )}
           
+          {leaveBreakdown.unpaidLeaves === 0 && leaveBreakdown.totalWorkingDays > 0 && (
+            <p className="text-green-600 font-semibold">
+              ✓ {leaveBreakdown.totalWorkingDays} day{leaveBreakdown.totalWorkingDays !== 1 ? 's' : ''} will be deducted from your balance. This leave is fully paid!
+            </p>
+          )}
+
           {leaveBreakdown.inProbation && (
-            <p className="mt-1 font-semibold text-red-600">
+            <p className={`mt-1 font-semibold ${leaveBreakdown.unpaidLeaves > 0 ? 'text-red-600' : 'text-green-600'}`}>
               ⚠️ You are in your 6-month probation period. All leaves are unpaid (Loss of Pay).
-            </p>
-          )}
-          
-          {!leaveBreakdown.inProbation && leaveBreakdown.unpaidLeaves > 0 && (
-            <p className="text-orange-600 mt-1 font-semibold">
-              ⚠️ Loss of Pay (LOP): {leaveBreakdown.unpaidLeaves} Day(s) 
-              <span className="font-normal block text-xs mt-0.5">(You are entitled to 1 paid leave per month)</span>
-            </p>
-          )}
-          
-          {!leaveBreakdown.inProbation && leaveBreakdown.unpaidLeaves === 0 && leaveBreakdown.totalWorkingDays > 0 && (
-            <p className="text-green-600 mt-1 font-semibold">
-              ✓ This leave is fully paid (within your 1 per month quota).
             </p>
           )}
         </div>

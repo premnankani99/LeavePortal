@@ -12,7 +12,8 @@ export default function EmployeeDashboard() {
     daysTakenThisMonth,
     inProbation,
     firstName,
-    greeting
+    greeting,
+    available_leaves
   } = useEmployeeDashboard();
 
   return (
@@ -24,19 +25,23 @@ export default function EmployeeDashboard() {
         stats={stats} 
       />
 
-      <QuickActions />
-
       <DashboardStats 
         stats={stats} 
+        available_leaves={available_leaves}
       />
 
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
-        <LeaveRulesCard 
-          inProbation={inProbation} 
-          monthsSinceJoining={monthsSinceJoining} 
-          availablePaid={availablePaid} 
-          daysTakenThisMonth={daysTakenThisMonth} 
-        />
+      <div className="flex flex-col gap-6">
+        <div>
+          <QuickActions />
+        </div>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
+          <LeaveRulesCard 
+            inProbation={inProbation} 
+            monthsSinceJoining={monthsSinceJoining} 
+            availablePaid={availablePaid} 
+            daysTakenThisMonth={daysTakenThisMonth} 
+          />
+        </div>
       </div>
       
     </div>

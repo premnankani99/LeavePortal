@@ -39,6 +39,12 @@ export const useAdminRequests = () => {
 
   const handleAction = (requestId, newStatus) => {
     const adminNote = comments[requestId] || '';
+    
+    if (newStatus === 'rejected' && !adminNote.trim()) {
+      toast.error("Please provide a reason (comment) before rejecting the leave.");
+      return false;
+    }
+
     requestMutation.mutate({ requestId, newStatus, adminNote }, {
       onSuccess: () => {
         toast.success(`Leave request ${newStatus} successfully!`);
@@ -50,10 +56,12 @@ export const useAdminRequests = () => {
       },
       onError: (err) => toast.error("Failed to process request: " + err.message)
     });
+    
+    return true;
   };
 
   const pendingRequests = useMemo(() => allRequests.filter(r => r.status === 'pending' || r.status === 'withdrawal_requested'), [allRequests]);
-  const processedRequests = useMemo(() => allRequests.filter(r => r.status !== 'pending' && r.status !== 'withdrawal_requested'), [allRequests]);
+  const processedRequests = useMemo(() => allRequests.filter(r => r.status !== 'pending' && r.status !== 'withdrawal_requested' && r.status !== 'cancelled'), [allRequests]);
 
   return {
     loadingReqs,

@@ -16,7 +16,7 @@ export default function VerificationQueue({
         <CardContent className="flex-1 flex flex-col overflow-auto">
           {loadingVerifications ? (
             <div className="flex-1 flex items-center justify-center py-10">
-              <Loader2 className="animate-spin text-purple-500 w-8 h-8" />
+              <Loader2 className="animate-spin text-[#7e57c2] w-8 h-8" />
             </div>
           ) : pendingVerifications.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center py-10">
@@ -34,7 +34,7 @@ export default function VerificationQueue({
                     <div>
                       <h4 className="font-semibold text-gray-900 text-lg">{emp.full_name || 'No Name Provided'}</h4>
                       <p className="text-sm text-gray-500">{emp.email}</p>
-                      <p className="text-xs text-purple-600 font-semibold mt-1 uppercase tracking-wider">Pending Verification</p>
+                      <p className="text-xs text-[#7e57c2] font-semibold mt-1 uppercase tracking-wider">Pending Verification</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -50,7 +50,7 @@ export default function VerificationQueue({
                     </Button>
                     <Button
                       size="sm"
-                      className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-1.5"
+                      className="bg-[#7e57c2] hover:bg-[#6a48a3] text-white flex items-center gap-1.5"
                       onClick={() => onVerify(emp.id)}
                       disabled={isVerifying}
                     >

@@ -19,7 +19,8 @@ export default function LeaveForm({ onSuccess }) {
     isSubmitting,
     isHalfDay,
     selectedSession,
-    myLeaves
+    myLeaves,
+    available_leaves
   } = useLeaveForm(onSuccess);
 
   if (loadingTypes) {
@@ -31,10 +32,15 @@ export default function LeaveForm({ onSuccess }) {
   }
 
   return (
-    <Card className="w-full bg-white shadow-sm border-blue-100 border-t-4 border-t-[#7e57c2]">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-bold text-gray-800">Apply for Leave</CardTitle>
-        <p className="text-sm text-gray-500 mt-1">Please fill in your details and select the dates.</p>
+    <Card className="w-full bg-white shadow-sm border-purple-100 border-t-4 border-t-[#7e57c2]">
+      <CardHeader className="pb-4 flex flex-row items-center justify-between">
+        <div>
+          <CardTitle className="text-xl font-bold text-gray-800">Apply for Leave</CardTitle>
+          <p className="text-sm text-gray-500 mt-1">Please fill in your details and select the dates.</p>
+        </div>
+        <div className="bg-purple-50 text-[#7e57c2] px-3 py-1.5 rounded-lg text-sm font-semibold border border-purple-100">
+          Balance: {available_leaves} Days
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 font-sans">
@@ -79,21 +85,6 @@ export default function LeaveForm({ onSuccess }) {
               </div>
               {errors.session && <p className="text-xs text-red-500 mt-1">{errors.session.message}</p>}
 
-              <label className="flex items-center space-x-2 cursor-pointer pt-3 pl-1">
-                <Controller
-                  name="is_compensatory"
-                  control={control}
-                  render={({ field }) => (
-                    <input 
-                      type="checkbox" 
-                      className="rounded text-green-500 focus:ring-green-500" 
-                      checked={field.value} 
-                      onChange={field.onChange} 
-                    />
-                  )}
-                />
-                <span className="text-sm font-medium text-gray-600">I will compensate these hours during the week (No salary/leave cut)</span>
-              </label>
             </div>
           )}
 
@@ -115,7 +106,7 @@ export default function LeaveForm({ onSuccess }) {
 
           <LeaveBreakdownAlert leaveBreakdown={leaveBreakdown} />
 
-          <Button type="submit" disabled={isSubmitting} className="w-full bg-[#9b72e5] hover:bg-[#7e57c2] text-white">
+          <Button type="submit" disabled={isSubmitting} className="w-full bg-[#7e57c2] hover:bg-[#5e35b1] text-white">
             {isSubmitting ? <Loader2 className="animate-spin h-5 w-5 mx-auto" /> : "Submit Application"}
           </Button>
         </form>

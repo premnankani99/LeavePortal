@@ -1,12 +1,12 @@
 import { Controller } from 'react-hook-form';
 import DatePickerDefault from "react-multi-date-picker";
 const DatePicker = DatePickerDefault.default || DatePickerDefault;
-import { COMPANY_HOLIDAYS, HOLIDAY_NAMES } from '../../utils/dateUtils';
+import { useHolidays } from '../../hooks/useHolidays';
 
 // A custom class for styling the Multi-Date Picker input via Tailwind instead of inline styles
 const inputClass = "w-full py-2.5 px-3.5 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-[#7e57c2] focus:border-[#7e57c2]";
 
-export default function LeaveDatePicker({ control, isHalfDay, errors, myLeaves = [] }) {
+export default function LeaveDatePicker({ control, isHalfDay, errors, myLeaves = [], allowPastDates = false }) {
   const now = new Date();
   const maxDate = new Date(now.getFullYear(), now.getMonth() + 2, 0);
 
@@ -23,6 +23,8 @@ export default function LeaveDatePicker({ control, isHalfDay, errors, myLeaves =
     }
   });
 
+  const { sortedHolidays, holidaysList } = useHolidays();
+
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">Select date{isHalfDay ? '' : '(s)'}</label>
@@ -31,12 +33,11 @@ export default function LeaveDatePicker({ control, isHalfDay, errors, myLeaves =
         control={control}
         render={({ field }) => (
           <DatePicker 
+            editable={false}
             range={!isHalfDay}
             rangeHover={!isHalfDay}
             value={field.value} 
             onChange={(dates) => {
-              // If user clicks the same date twice in range mode, it sets start and end to the same date.
-              // We intercept this and clear the selection instead, to simulate "deselect".
               if (Array.isArray(dates) && dates.length === 2) {
                 const start = dates[0];
                 const end = dates[1];
@@ -48,7 +49,7 @@ export default function LeaveDatePicker({ control, isHalfDay, errors, myLeaves =
               field.onChange(dates);
             }}
             format="YYYY-MM-DD"
-            minDate={new Date()}
+            minDate={allowPastDates ? undefined : new Date()}
             maxDate={maxDate}
             inputClass={inputClass}
             containerClassName="w-full sm:w-1/2"
@@ -59,28 +60,29 @@ export default function LeaveDatePicker({ control, isHalfDay, errors, myLeaves =
               const jsDate = new Date(dateStr);
               const dayOfWeek = jsDate.getDay();
               const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-              const isHoliday = COMPANY_HOLIDAYS.includes(dateStr);
+              const isHoliday = holidaysList.includes(dateStr);
               const isApplied = appliedDates.has(dateStr);
 
               if (isApplied) {
                 return {
                   disabled: true,
-                  className: "text-red-500 bg-red-50 cursor-not-allowed font-semibold line-through",
+                  style: { color: "#ef4444", textDecoration: "line-through", backgroundColor: "#fef2f2", fontWeight: "bold" },
                   title: 'Already applied for leave on this date'
                 };
               }
               if (isWeekend) {
                 return {
                   disabled: true,
-                  className: "text-gray-300 bg-gray-50 cursor-not-allowed",
+                  style: { color: "#ccc", backgroundColor: "#fafafa" },
                   title: dayOfWeek === 6 ? 'Saturday – Weekend' : 'Sunday – Weekend'
                 };
               }
               if (isHoliday) {
+                const holidayObj = sortedHolidays.find(h => h.dateStr === dateStr);
                 return {
                   disabled: true,
-                  className: "text-orange-500 bg-orange-50 cursor-not-allowed font-semibold",
-                  title: HOLIDAY_NAMES[dateStr] || 'Public Holiday'
+                  style: { color: "#f97316", backgroundColor: "#fff7ed", fontWeight: "bold" },
+                  title: holidayObj?.name || 'Public Holiday'
                 };
               }
             }}

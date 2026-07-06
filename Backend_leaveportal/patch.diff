@@ -1,0 +1,120 @@
+diff --git a/Backend_leaveportal/controllers/leaves.ts b/Backend_leaveportal/controllers/leaves.ts
+index 63e47c1..eeef139 100644
+--- a/Backend_leaveportal/controllers/leaves.ts
++++ b/Backend_leaveportal/controllers/leaves.ts
+@@ -153,6 +153,99 @@ export const getMyLeaves = async (req: AuthRequest, res: Response): Promise<void
+     }
+ };
+ 
++export const getLeavesByEmployee = async (req: AuthRequest, res: Response): Promise<void> => {
++    try {
++        const { employeeId } = req.params;
++        const leaves = await prisma.leave_requests.findMany({
++            where: { employee_id: String(employeeId) },
++            include: { employee: true },
++            orderBy: { created_at: 'desc' }
++        });
++        res.status(HTTP_STATUS.OK).json(leaves);
++    } catch (_error) {
++        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.FETCH_ERROR });
++    }
++};
++
++/**
++ * Manually adjusts unpaid leave if employee has available balance.
++ */
++export const adjustUnpaidLeave = async (req: AuthRequest, res: Response): Promise<void> => {
++    try {
++        const { leaveId } = req.body;
++        const employeeId = String(req.user?.id);
++
++        const leave = await prisma.leave_requests.findUnique({ where: { id: String(leaveId) } });
++        if (!leave || leave.employee_id !== employeeId) {
++            res.status(HTTP_STATUS.NOT_FOUND).json({ error: MESSAGES.LEAVE_NOT_FOUND });
++            return;
++        }
++
++        if (leave.status !== 'pending' && leave.status !== 'approved') {
++            res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Cannot adjust a cancelled or rejected leave." });
++            return;
++        }
++
++        const currentPaid = leave.paid_days !== null ? leave.paid_days : leave.total_days;
++        const unpaidDays = leave.total_days - currentPaid;
++
++        if (unpaidDays <= 0) {
++            res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "This leave is already fully paid." });
++            return;
++        }
++
++        const profile = await prisma.profiles.findUnique({ where: { id: employeeId } });
++        if (!profile || profile.available_leaves <= 0) {
++            res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "No available leaves to adjust." });
++            return;
++        }
++
++        const now = new Date();
++        const leaveStart = new Date(leave.start_date);
++        
++        if (leaveStart.getMonth() !== now.getMonth() || leaveStart.getFullYear() !== now.getFullYear()) {
++            res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Can only adjust leaves from the current calendar month." });
++            return;
++        }
++
++        const diffTime = now.getTime() - leaveStart.getTime();
++        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
++        if (diffDays > 8) { 
++            res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Leave must be within the last 7 days to be adjustable." });
++            return;
++        }
++
++        const daysToUpgrade = Math.min(unpaidDays, profile.available_leaves);
++        const newPaidDays = currentPaid + daysToUpgrade;
++        
++        let baseLeaveType = leave.leave_type.split(' (')[0];
++        let newLeaveTypeString = '';
++        
++        if (newPaidDays >= leave.total_days) {
++            newLeaveTypeString = `${baseLeaveType} (Paid)`;
++        } else {
++            newLeaveTypeString = newPaidDays > 0 
++                ? `${baseLeaveType} (${newPaidDays} Paid, ${leave.total_days - newPaidDays} Unpaid LOP)` 
++                : `${baseLeaveType} (Unpaid - LOP)`;
++        }
++
++        const [updatedLeave] = await prisma.$transaction([
++            prisma.leave_requests.update({
++                where: { id: leave.id },
++                data: { paid_days: newPaidDays, leave_type: newLeaveTypeString }
++            }),
++            prisma.profiles.update({
++                where: { id: employeeId },
++                data: { available_leaves: { decrement: daysToUpgrade } }
++            })
++        ]);
++
++        res.status(HTTP_STATUS.OK).json({ message: "Leave successfully adjusted.", leave: updatedLeave });
++    } catch (error) {
++        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.SERVER_ERROR });
++    }
++};
++
+ /**
+  * Fetches all leaves for admin.
+  * @param {AuthRequest} _req - Request object.
+@@ -198,6 +291,15 @@ const computeWithdrawalUpdateData = (leave: any, status: string): any => {
+     return updateData;
+ };
+ 
++/**
++ * Adjusts unpaid leave days if needed.
++ * @param {any} leave - Leave object.
++ * @returns {Promise<void>}
++ */
++export const adjustUnpaidLeave = async (leave: any): Promise<void> => {
++    // Logic for adjusting unpaid leaves
++};
++
+ /**
+  * Sends status update email.
+  * @param {any} leave - The updated leave.

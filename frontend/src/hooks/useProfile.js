@@ -6,7 +6,7 @@ export const useProfile = () => {
   const { data: myLeaves = [] } = useMyRequests();
   const { data: myBalances = [] } = useMyBalances();
   
-  const joinedDate = user?.created_at ? new Date(user.created_at) : new Date();
+  const joinedDate = user?.date_of_joining ? new Date(user.date_of_joining) : (user?.created_at ? new Date(user.created_at) : new Date());
   const joinedStr = joinedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   
   const now = new Date();
@@ -17,6 +17,8 @@ export const useProfile = () => {
 
   const approvedLeaves = myLeaves.filter(l => l.status === 'approved').length;
   const pendingLeaves = myLeaves.filter(l => l.status === 'pending').length;
+  const rejectedLeaves = myLeaves.filter(l => l.status === 'rejected').length;
+  const withdrawnLeaves = myLeaves.filter(l => l.status === 'cancelled').length;
 
   return {
     user,
@@ -27,6 +29,8 @@ export const useProfile = () => {
     joinedStr,
     inProbation,
     approvedLeaves,
-    pendingLeaves
+    pendingLeaves,
+    rejectedLeaves,
+    withdrawnLeaves
   };
 };

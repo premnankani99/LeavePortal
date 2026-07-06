@@ -4,13 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { leaveSchema } from '../utils/leaveValidation';
 import { calculateMultiDateBreakdown } from '../utils/dateUtils';
 import { useAuth } from '../context/AuthContext';
-import { useLeaveTypes, useCreateRequest, useMyRequests } from './useLeaves';
+import { useLeaveTypes, useCreateRequest, useMyRequests, useMyBalances } from './useLeaves';
+import { useHolidays } from './useHolidays';
 import { useToast } from '../context/ToastContext';
 
 export const useLeaveForm = (onSuccess) => {
-  const { profile } = useAuth();
+  const { user } = useAuth();
   const { data: leaveTypes = [], isLoading: loadingTypes } = useLeaveTypes();
   const { data: myLeaves = [] } = useMyRequests();
+  const { data: available_leaves = 0 } = useMyBalances();
+  const { holidaysList } = useHolidays();
   const createRequest = useCreateRequest();
   const toast = useToast();
   
@@ -24,7 +27,6 @@ export const useLeaveForm = (onSuccess) => {
       reason: '',
       emergency_contact: '',
       is_half_day: false,
-      is_compensatory: false,
       session: ''
     }
   });
@@ -34,22 +36,24 @@ export const useLeaveForm = (onSuccess) => {
   const selectedDates = watch('dates');
   const selectedTypeId = watch('leave_type_id');
   const isHalfDay = watch('is_half_day');
-  const isCompensatory = watch('is_compensatory');
   const selectedSession = watch('session');
 
   const allowedTypes = leaveTypes.filter(t => t.name.includes('Casual') || t.name.includes('Sick'));
 
   // Expand range dates
   const expandedDates = useMemo(() => {
-    if (!selectedDates || selectedDates.length === 0) return [];
+    if (!selectedDates) return [];
+    
+    const datesArr = Array.isArray(selectedDates) ? selectedDates : [selectedDates];
+    if (datesArr.length === 0) return [];
     
     // If only one date is selected, it acts as both start and end date
-    if (isHalfDay || selectedDates.length === 1) {
-      return [...selectedDates];
+    if (isHalfDay || datesArr.length === 1) {
+      return [...datesArr];
     }
     
-    const start = selectedDates[0];
-    const end = selectedDates[1];
+    const start = datesArr[0];
+    const end = datesArr[1];
     
     const getJsDate = (d) => {
       if (!d) return null;
@@ -81,38 +85,27 @@ export const useLeaveForm = (onSuccess) => {
   useEffect(() => {
     if (expandedDates && expandedDates.length > 0) {
       // Calculate probation and available paid leaves
-      const joinedDate = new Date(profile?.created_at || new Date());
+      const joinedDate = new Date(user?.created_at || new Date());
       const now = new Date();
       const diffYears = now.getFullYear() - joinedDate.getFullYear();
       const diffMonths = now.getMonth() - joinedDate.getMonth();
       const monthsSinceJoining = (diffYears * 12) + diffMonths;
 
-      let availablePaid = 0;
-      if (monthsSinceJoining >= 6) {
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-        
-        let daysTakenThisMonth = 0;
-        myLeaves.forEach(req => {
-          if (req.status === 'rejected' || req.status === 'cancelled') return;
-          const reqStart = new Date(req.start_date);
-          if (reqStart.getMonth() === currentMonth && reqStart.getFullYear() === currentYear) {
-            daysTakenThisMonth += req.total_days || 0;
-          }
-        });
-        
-        availablePaid = Math.max(0, 1 - daysTakenThisMonth);
-      }
+      const inProbation = monthsSinceJoining < 6;
+      let availablePaid = available_leaves || 0;
       
-      const breakdown = calculateMultiDateBreakdown(expandedDates, availablePaid, isHalfDay, isCompensatory);
+      const breakdown = calculateMultiDateBreakdown(expandedDates, availablePaid, isHalfDay, holidaysList);
       
       // Also add probation warning to breakdown
-      breakdown.inProbation = monthsSinceJoining < 6;
+      breakdown.inProbation = inProbation;
+      // Add actual balance for messaging
+      breakdown.actualBalance = available_leaves || 0;
+      
       setLeaveBreakdown(breakdown);
     } else {
       setLeaveBreakdown(null);
     }
-  }, [expandedDates, selectedTypeId, myLeaves, profile, isHalfDay, isCompensatory]);
+  }, [expandedDates, selectedTypeId, myLeaves, user, isHalfDay, available_leaves, holidaysList]);
 
   const onSubmit = (data) => {
     const formattedDates = expandedDates.map(d => {
@@ -125,14 +118,16 @@ export const useLeaveForm = (onSuccess) => {
     // Sort dates
     formattedDates.sort();
 
+    // Synchronously calculate working days to avoid stale state issues
+    const syncBreakdown = calculateMultiDateBreakdown(expandedDates, available_leaves || 0, data.is_half_day, holidaysList);
+
     const requestPayload = {
       leave_type_id: data.leave_type_id,
       start_date: formattedDates[0],
       end_date: formattedDates[formattedDates.length - 1],
-      total_days: leaveBreakdown ? leaveBreakdown.totalWorkingDays : formattedDates.length,
+      total_days: syncBreakdown.totalWorkingDays,
       reason: data.is_half_day ? `[Half-Day: ${data.session}] ${data.reason}` : data.reason,
-      is_half_day: data.is_half_day,
-      is_compensatory: data.is_compensatory
+      is_half_day: data.is_half_day
     };
 
     createRequest.mutate(requestPayload, {
@@ -157,6 +152,7 @@ export const useLeaveForm = (onSuccess) => {
     isSubmitting: createRequest.isPending,
     isHalfDay,
     selectedSession,
-    myLeaves
+    myLeaves,
+    available_leaves
   };
 };

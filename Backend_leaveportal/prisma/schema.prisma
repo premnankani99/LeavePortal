@@ -27,8 +27,8 @@ model profiles {
   designation         String?
   employee_code       String?            @unique
   date_of_joining     DateTime?
-  total_leaves        Int                @default(20)
-  available_leaves    Float              @default(20)
+  total_leaves        Int                @default(0)
+  available_leaves    Float              @default(0)
   is_active           Boolean            @default(false)
   is_deleted          Boolean            @default(false)
   email_verified      Boolean            @default(false)
@@ -41,6 +41,7 @@ model profiles {
   updated_at          DateTime           @updatedAt
   leave_requests      leave_requests[]   @relation("EmployeeLeaves")
   approved_leaves     leave_requests[]   @relation("ApprovedLeaves")
+  comp_off_grants     CompOffGrant[]
 }
 
 model leave_requests {
@@ -51,6 +52,7 @@ model leave_requests {
   start_date              DateTime
   end_date                DateTime
   total_days              Float
+  paid_days               Float?
   reason                  String    @db.Text
   status                  String    @default("pending")
   approved_by             String?
@@ -84,4 +86,16 @@ model audit_logs {
   target_table String
   target_id    String
   created_at   DateTime @default(now())
+}
+
+model CompOffGrant {
+  id           String   @id @default(uuid())
+  employeeId   String
+  employee     profiles @relation(fields: [employeeId], references: [id])
+  daysGranted  Float
+  reason       String
+  grantedBy    String?
+  grantedAt    DateTime @default(now())
+  status       String   @default("approved") // "pending", "approved", "rejected"
+  adminNote    String?  @db.Text
 }

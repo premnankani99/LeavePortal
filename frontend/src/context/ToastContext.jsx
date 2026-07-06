@@ -35,7 +35,7 @@ export function ToastProvider({ children }) {
     success: { icon: CheckCircle, bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-800', icon_cls: 'text-emerald-500' },
     error:   { icon: XCircle,     bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-800',     icon_cls: 'text-red-500' },
     warning: { icon: AlertTriangle,bg: 'bg-amber-50',  border: 'border-amber-200',   text: 'text-amber-800',   icon_cls: 'text-amber-500' },
-    info:    { icon: Info,         bg: 'bg-blue-50',   border: 'border-blue-200',    text: 'text-blue-800',    icon_cls: 'text-blue-500' },
+    info:    { icon: Info,         bg: 'bg-purple-50',   border: 'border-purple-200',    text: 'text-purple-800',    icon_cls: 'text-[#7e57c2]' },
   };
 
   return (

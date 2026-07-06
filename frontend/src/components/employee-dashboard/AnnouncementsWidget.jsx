@@ -8,10 +8,10 @@ export default function AnnouncementsWidget({ displayAnnouncements, onSelect }) 
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
       <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
         <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-          <Megaphone className="w-5 h-5 text-purple-600" /> 
+          <Megaphone className="w-5 h-5 text-[#7e57c2]" /> 
           Recent Announcements
         </h2>
-        <Link to="/announcements" className="text-sm font-medium text-purple-600 hover:text-purple-700 flex items-center gap-1">
+        <Link to="/announcements" className="text-sm font-medium text-[#7e57c2] hover:text-purple-700 flex items-center gap-1">
           View All <ChevronRight className="w-4 h-4" />
         </Link>
       </div>
@@ -24,7 +24,7 @@ export default function AnnouncementsWidget({ displayAnnouncements, onSelect }) 
               onClick={() => onSelect(ann)}
               className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-4 ${isUnread ? 'bg-purple-50/30' : ''}`}
             >
-              <div className={`p-2 rounded-full shrink-0 mt-0.5 ${ann.priority === 'urgent' ? 'bg-red-100 text-red-600' : 'bg-purple-100 text-purple-600'}`}>
+              <div className={`p-2 rounded-full shrink-0 mt-0.5 ${ann.priority === 'urgent' ? 'bg-red-100 text-red-600' : 'bg-purple-100 text-[#7e57c2]'}`}>
                 {ann.priority === 'urgent' ? <AlertTriangle className="w-4 h-4" /> : <Megaphone className="w-4 h-4" />}
               </div>
               <div className="flex-1 min-w-0">
@@ -33,7 +33,7 @@ export default function AnnouncementsWidget({ displayAnnouncements, onSelect }) 
                 </h4>
                 <p className="text-sm text-gray-500 truncate mt-0.5">{ann.message}</p>
               </div>
-              {isUnread && <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 shrink-0"></div>}
+              {isUnread && <div className="w-2 h-2 bg-[#7e57c2] rounded-full mt-2 shrink-0"></div>}
             </div>
           );
         })}

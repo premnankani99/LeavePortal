@@ -24,8 +24,27 @@ export const useRegisterForm = () => {
     }
   }, [user, role, navigate]);
 
-  const handleRegister = async (e) => {
+    const handleRegister = async (e) => {
     e.preventDefault();
+    
+    // Client-side Validation
+    const nameRegex = /^[A-Za-z\s]{3,50}$/;
+    if (!nameRegex.test(fullName.trim())) {
+      toast.error("Full Name must be between 3 and 50 characters and contain only letters.");
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long.");
+      return;
+    }
+
     setLoading(true);
     
     try {

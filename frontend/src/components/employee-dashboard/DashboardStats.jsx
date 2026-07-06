@@ -1,6 +1,6 @@
 import { FileText, CheckCircle, Clock, XCircle } from 'lucide-react';
 
-export default function DashboardStats({ stats }) {
+export default function DashboardStats({ stats, available_leaves }) {
   const statCards = [
     { label: 'Approved', value: stats.approved, icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
     { label: 'Pending', value: stats.pending, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-100' },
@@ -8,7 +8,7 @@ export default function DashboardStats({ stats }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+    <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
       {statCards.map((s, idx) => {
         const Icon = s.icon;
         return (

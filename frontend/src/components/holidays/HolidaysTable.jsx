@@ -1,6 +1,6 @@
-import { TreePine, Sun } from 'lucide-react';
+import { TreePine, Sun, Trash2, Loader2 } from 'lucide-react';
 
-export default function HolidaysTable({ sortedHolidays, currentYear }) {
+export default function HolidaysTable({ sortedHolidays, currentYear, isHolidayAdmin, onDelete, isDeleting }) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex-1 flex flex-col">
       {sortedHolidays.length === 0 ? (
@@ -16,13 +16,16 @@ export default function HolidaysTable({ sortedHolidays, currentYear }) {
                 <th className="px-6 py-5 font-semibold text-gray-600 uppercase tracking-wide text-sm">Date</th>
                 <th className="px-6 py-5 font-semibold text-gray-600 uppercase tracking-wide text-sm">Day</th>
                 <th className="px-6 py-5 font-semibold text-gray-600 uppercase tracking-wide text-sm">Holiday Name</th>
+                {isHolidayAdmin && (
+                  <th className="px-6 py-5 font-semibold text-gray-600 uppercase tracking-wide text-sm text-right">Actions</th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {sortedHolidays.map((holiday, idx) => {
                 const isPast = holiday.date < new Date(new Date().setHours(0,0,0,0));
                 return (
-                  <tr key={idx} className={`hover:bg-purple-50/50 transition-colors group ${isPast ? 'opacity-60' : ''}`}>
+                  <tr key={holiday.id || idx} className={`hover:bg-purple-50/50 transition-colors group ${isPast ? 'opacity-60' : ''}`}>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium group-hover:text-[#7e57c2] transition-colors">
                       {holiday.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </td>
@@ -34,6 +37,18 @@ export default function HolidaysTable({ sortedHolidays, currentYear }) {
                       {holiday.name}
                       {isPast && <span className="ml-2 text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-500 uppercase tracking-wider font-semibold">Past</span>}
                     </td>
+                    {isHolidayAdmin && (
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <button 
+                          onClick={() => onDelete(holiday.id)}
+                          disabled={isDeleting}
+                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                          title="Delete Holiday"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 );
               })}

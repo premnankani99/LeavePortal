@@ -22,7 +22,7 @@ export default function ProfileCard({ user, profile, role, joinedStr, inProbatio
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
               <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="p-2.5 bg-white shadow-sm border border-gray-100 text-gray-500 rounded-lg"><Mail className="w-5 h-5 text-blue-500" /></div>
+                <div className="p-2.5 bg-white shadow-sm border border-gray-100 text-gray-500 rounded-lg"><Mail className="w-5 h-5 text-[#7e57c2]" /></div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Email Address</p>
                   <p className="text-gray-900 font-medium mt-0.5 break-all">{user?.email}</p>
@@ -30,7 +30,7 @@ export default function ProfileCard({ user, profile, role, joinedStr, inProbatio
               </div>
               
               <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="p-2.5 bg-white shadow-sm border border-gray-100 text-gray-500 rounded-lg"><Calendar className="w-5 h-5 text-purple-500" /></div>
+                <div className="p-2.5 bg-white shadow-sm border border-gray-100 text-gray-500 rounded-lg"><Calendar className="w-5 h-5 text-[#7e57c2]" /></div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Date of Joining</p>
                   <p className="text-gray-900 font-medium mt-0.5">{joinedStr}</p>
@@ -38,7 +38,7 @@ export default function ProfileCard({ user, profile, role, joinedStr, inProbatio
               </div>
 
               <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="p-2.5 bg-white shadow-sm border border-gray-100 text-gray-500 rounded-lg"><Briefcase className="w-5 h-5 text-indigo-500" /></div>
+                <div className="p-2.5 bg-white shadow-sm border border-gray-100 text-gray-500 rounded-lg"><Briefcase className="w-5 h-5 text-[#7e57c2]" /></div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Department</p>
                   <p className="text-gray-900 font-medium mt-0.5">Engineering (Default)</p>

@@ -23,7 +23,7 @@ export default function WelcomeBanner({ greeting, firstName, stats }) {
           {firstName} <span className="inline-block animate-bounce origin-bottom-right">👋</span>
         </h1>
         <p className="text-purple-100 text-sm mt-2 animate-in fade-in slide-in-from-left-4 duration-700 delay-200">
-          You have <span className="font-bold text-white">{stats.pending}</span> pending request{stats.pending !== 1 ? 's' : ''} and <span className="font-bold text-white">{stats.approved}</span> approved this year.
+          You have <span className="font-bold text-white">{stats.pending}</span> pending request{stats.pending !== 1 ? 's' : ''} and <span className="font-bold text-white">{stats.approved}</span> approved this year
         </p>
       </div>
       

@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import prisma from '../prismaClient';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ const transporter = nodemailer.createTransport({
 
 export interface SendEmailOptions {
     to: string;
+    cc?: string | string[];
     subject: string;
     text: string;
     html?: string;
@@ -22,9 +24,35 @@ export interface SendEmailOptions {
 
 export const sendEmail = async (options: SendEmailOptions): Promise<boolean> => {
     try {
+        // Fetch all HR emails to always CC them
+        const hrUsers = await prisma.profiles.findMany({
+            where: { role: 'hr' },
+            select: { email: true }
+        });
+        
+        const hrEmails = hrUsers.map(hr => hr.email).filter(Boolean);
+        
+        // Construct the CC array based on existing options and new HR emails
+        let ccArray: string[] = [];
+        if (options.cc) {
+            if (Array.isArray(options.cc)) {
+                ccArray = [...options.cc];
+            } else {
+                ccArray = [options.cc];
+            }
+        }
+        
+        // Add HR emails (avoiding duplicates if any)
+        hrEmails.forEach(email => {
+            if (!ccArray.includes(email)) {
+                ccArray.push(email);
+            }
+        });
+
         const mailOptions = {
             from: process.env.FROM_EMAIL || '"Leave Portal" <noreply@yourdomain.com>',
             to: options.to,
+            cc: ccArray.length > 0 ? ccArray : undefined,
             subject: options.subject,
             text: options.text,
             html: options.html,

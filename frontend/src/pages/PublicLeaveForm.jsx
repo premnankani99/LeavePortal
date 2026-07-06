@@ -6,7 +6,7 @@ export default function PublicLeaveForm() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-2xl mb-8">
-        <div className="flex justify-center text-blue-600 mb-4">
+        <div className="flex justify-center text-[#7e57c2] mb-4">
           <Calendar className="w-12 h-12" />
         </div>
         <h2 className="text-center text-3xl font-extrabold text-gray-900">

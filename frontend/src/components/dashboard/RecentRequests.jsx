@@ -5,7 +5,7 @@ dayjs.extend(relativeTime);
 
 export default function RecentRequests({ allRequests, loadingReq }) {
   return (
-    <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col h-[400px]">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col h-[400px]">
       <div className="p-5 border-b border-gray-100 shrink-0 flex justify-between items-center">
         <div>
           <h3 className="font-semibold text-gray-800 flex items-center gap-2">
@@ -49,7 +49,7 @@ export default function RecentRequests({ allRequests, loadingReq }) {
                   <p className="font-semibold text-gray-800 text-sm truncate">{req.profiles?.full_name || req.profiles?.email || 'Employee'}</p>
                   <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: req.leave_types?.color_code || '#7e57c2' }} />
-                    {req.leave_types?.name} · {req.total_days} day{req.total_days !== 1 ? 's' : ''} {req.is_half_day && <span className="font-bold text-purple-600 bg-purple-100 px-1.5 rounded">(Half Day - {sessionDisplay})</span>}
+                    {req.leave_types?.name} · {req.total_days} day{req.total_days !== 1 ? 's' : ''} {req.is_half_day && <span className="font-bold text-[#7e57c2] bg-purple-100 px-1.5 rounded">(Half Day - {sessionDisplay})</span>}
                   </p>
                 </div>
                 <div className="text-right shrink-0">

@@ -35,6 +35,14 @@ const handleExistingUserForRegister = async (email: string): Promise<boolean> =>
     return true;
 };
 
+const capitalizeName = (name: string): string => {
+    if (!name) return name;
+    return name
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+};
+
 /**
  * Creates a new user with OTP.
  * @param {any} data - The user registration data.
@@ -47,7 +55,7 @@ const createUserWithOtp = async (data: any): Promise<any> => {
 
     const newUser = await prisma.profiles.create({
         data: {
-            full_name: data.full_name,
+            full_name: capitalizeName(data.full_name),
             email: data.email,
             password: hashedPassword,
             role: "employee",
@@ -56,6 +64,12 @@ const createUserWithOtp = async (data: any): Promise<any> => {
             otp_expires_at: otpExpiresAt
         }
     });
+    
+    // Log OTP to console for easier local testing
+    console.log(`\n=========================================`);
+    console.log(`🔐 OTP for ${data.email} is: ${otpCode}`);
+    console.log(`=========================================\n`);
+    
     return { newUser, otpCode };
 };
 
@@ -67,7 +81,8 @@ const createUserWithOtp = async (data: any): Promise<any> => {
  */
 export const register = async (_req: Request, res: Response): Promise<void> => {
     try {
-        const { full_name, email, password } = _req.body;
+        const { full_name, password } = _req.body;
+        const email = _req.body.email.toLowerCase();
 
         if (email.toLowerCase() === 'premnankani99@gmail.com') {
             res.status(HTTP_STATUS.BAD_REQUEST).json({ error: MESSAGES.ADMIN_REGISTRATION_NOT_ALLOWED });
@@ -121,7 +136,8 @@ const validateUserForOtp = (user: any, otp: string): string | null => {
  */
 export const verifyOtp = async (_req: Request, res: Response): Promise<void> => {
     try {
-        const { email, otp } = _req.body;
+        const { otp } = _req.body;
+        const email = _req.body.email.toLowerCase();
         const user = await prisma.profiles.findUnique({ where: { email } });
         
         const errorMsg = validateUserForOtp(user, otp);
@@ -156,6 +172,11 @@ const handleUnverifiedLogin = async (user: any): Promise<void> => {
         data: { otp_code: otpCode, otp_expires_at: otpExpiresAt }
     });
 
+    // Log OTP to console for easier local testing
+    console.log(`\n=========================================`);
+    console.log(`🔐 OTP for ${user.email} is: ${otpCode}`);
+    console.log(`=========================================\n`);
+
     await sendEmail({
         to: user.email,
         subject: 'Verify Your Email - Leave Portal',
@@ -172,11 +193,12 @@ const handleUnverifiedLogin = async (user: any): Promise<void> => {
  */
 export const login = async (_req: Request, res: Response): Promise<void> => {
     try {
-        const { email, password } = _req.body;
+        const { password } = _req.body;
+        const email = _req.body.email.toLowerCase();
         const user = await prisma.profiles.findUnique({ where: { email } });
 
         if (!user || !user.password) {
-            res.status(HTTP_STATUS.NOT_FOUND).json({ error: MESSAGES.INVALID_CREDENTIALS });
+            res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Email not registered" });
             return;
         }
 
@@ -195,6 +217,7 @@ export const login = async (_req: Request, res: Response): Promise<void> => {
         const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
         res.status(HTTP_STATUS.OK).json({ message: MESSAGES.LOGIN_SUCCESS, token, user });
     } catch (_error) {
+        console.error("Login Error:", _error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.SERVER_ERROR });
     }
 };
@@ -207,7 +230,7 @@ export const login = async (_req: Request, res: Response): Promise<void> => {
  */
 export const forgotPassword = async (_req: Request, res: Response): Promise<void> => {
     try {
-        const { email } = _req.body;
+        const email = _req.body.email.toLowerCase();
         const user = await prisma.profiles.findUnique({ where: { email } });
 
         if (!user) {
@@ -257,7 +280,8 @@ const validateResetToken = (user: any, otp: string): string | null => {
  */
 export const resetPassword = async (_req: Request, res: Response): Promise<void> => {
     try {
-        const { email, otp, newPassword } = _req.body;
+        const { otp, newPassword } = _req.body;
+        const email = _req.body.email.toLowerCase();
         const user = await prisma.profiles.findUnique({ where: { email } });
 
         const errorMsg = validateResetToken(user, otp);

@@ -3,19 +3,19 @@ import { Users, Mail, Calendar, ShieldCheck, Loader2, Search, Trash2, Filter, Al
 
 // Replaced inline style array with Tailwind classes per requirements
 const AVATAR_COLORS = [
-  'bg-purple-600',
+  'bg-[#7e57c2]',
   'bg-emerald-500',
   'bg-amber-500',
   'bg-red-500',
-  'bg-indigo-500'
+  'bg-purple-500'
 ];
 
-export default function EmployeeTable({ filteredEmployees, isLoading, search, setSearch, department, setDepartment, onDelete, onUpdate }) {
+export default function EmployeeTable({ filteredEmployees, isLoading, search, setSearch, department, setDepartment, onDelete, onUpdate, onRowClick, readOnly }) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null); // For details modal
   const [employeeToEdit, setEmployeeToEdit] = useState(null); // For edit modal
-  const [editFormData, setEditFormData] = useState({ full_name: '', email: '', designation: '', phone: '' });
+  const [editFormData, setEditFormData] = useState({ full_name: '', email: '', designation: '', phone: '', date_of_joining: '' });
 
   const handleEditClick = (emp) => {
     setEmployeeToEdit(emp);
@@ -23,7 +23,8 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
       full_name: emp.full_name || '',
       email: emp.email || '',
       designation: emp.designation || '',
-      phone: emp.phone || ''
+      phone: emp.phone || '',
+      date_of_joining: emp.date_of_joining ? new Date(emp.date_of_joining).toISOString().split('T')[0] : (emp.created_at ? new Date(emp.created_at).toISOString().split('T')[0] : '')
     });
   };
 
@@ -41,7 +42,7 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
   };
 
   const confirmDeletion = () => {
-    if (employeeToDelete) {
+    if (employeeToDelete && onDelete) {
       onDelete(employeeToDelete.id);
       setEmployeeToDelete(null);
       setShowConfirmModal(false);
@@ -110,8 +111,9 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
               <th className="px-4 py-4 font-semibold text-gray-600 uppercase tracking-wide text-sm">Contact</th>
               <th className="px-4 py-4 font-semibold text-gray-600 uppercase tracking-wide text-sm">Department</th>
               <th className="px-4 py-4 font-semibold text-gray-600 uppercase tracking-wide text-sm">Joined Date</th>
+              <th className="px-4 py-4 font-semibold text-gray-600 uppercase tracking-wide text-sm text-center">Leave Balance</th>
               <th className="px-4 py-4 font-semibold text-gray-600 uppercase tracking-wide text-sm">Status</th>
-              <th className="px-4 py-4 font-semibold text-gray-600 uppercase tracking-wide text-sm text-right">Actions</th>
+              {!readOnly && <th className="px-4 py-4 font-semibold text-gray-600 uppercase tracking-wide text-sm text-right">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -120,7 +122,7 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
                 <td className="px-4 py-4">
                   <div 
                     className="flex items-center gap-3 cursor-pointer"
-                    onClick={() => setSelectedEmployee(emp)}
+                    onClick={() => onRowClick ? onRowClick(emp) : setSelectedEmployee(emp)}
                     title="Click to view details"
                   >
                     <div 
@@ -148,7 +150,12 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
                 <td className="px-4 py-4 text-gray-500 text-sm whitespace-nowrap">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    {new Date(emp.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    {new Date(emp.date_of_joining || emp.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </div>
+                </td>
+                <td className="px-4 py-4 text-center whitespace-nowrap">
+                  <div className="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-bold bg-purple-100 text-[#7e57c2] border border-purple-200 shadow-sm">
+                    {emp.available_leaves ?? 0} Days
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
@@ -156,24 +163,26 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
                     <ShieldCheck className="w-4 h-4" /> Verified
                   </span>
                 </td>
-                <td className="px-4 py-4 text-right whitespace-nowrap">
-                  <div className="flex items-center justify-end gap-1 transition-opacity">
-                    <button
-                      onClick={() => handleEditClick(emp)}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="Edit Employee"
-                    >
-                      <Edit className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(emp)}
-                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Remove Employee"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
+                {!readOnly && (
+                  <td className="px-4 py-4 text-right whitespace-nowrap">
+                    <div className="flex items-center justify-end gap-1 transition-opacity">
+                      <button
+                        onClick={() => handleEditClick(emp)}
+                        className="p-2 text-gray-400 hover:text-[#7e57c2] hover:bg-purple-50 rounded-lg transition-colors"
+                        title="Edit Employee"
+                      >
+                        <Edit className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(emp)}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Remove Employee"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -243,7 +252,7 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
               </button>
               
               <div className="flex flex-col items-center mt-2 mb-6">
-                <div className="w-24 h-24 rounded-full flex items-center justify-center text-white font-bold text-3xl mb-4 bg-purple-600">
+                <div className="w-24 h-24 rounded-full flex items-center justify-center text-white font-bold text-3xl mb-4 bg-[#7e57c2]">
                   {(selectedEmployee.full_name || selectedEmployee.email).charAt(0).toUpperCase()}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">{selectedEmployee.full_name || 'No Name'}</h3>
@@ -261,7 +270,7 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
                 </div>
                 <div className="flex items-center gap-3 text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100">
                   <Calendar className="w-5 h-5 text-gray-400 shrink-0" />
-                  <span className="text-sm font-medium">Joined {new Date(selectedEmployee.created_at || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                  <span className="text-sm font-medium">Joined {new Date(selectedEmployee.date_of_joining || selectedEmployee.created_at || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100">
                   <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0" />
@@ -280,8 +289,8 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
             <form onSubmit={handleEditSubmit} className="p-6">
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                    <Edit className="w-5 h-5 text-blue-500" />
+                  <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center shrink-0">
+                    <Edit className="w-5 h-5 text-[#7e57c2]" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900">Edit Employee</h3>
@@ -342,6 +351,15 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
                     placeholder="e.g. +91 9876543210"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Date of Joining</label>
+                  <input 
+                    type="date" 
+                    value={editFormData.date_of_joining} 
+                    onChange={e => setEditFormData({...editFormData, date_of_joining: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-shadow"
+                  />
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
@@ -354,7 +372,7 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl font-medium bg-blue-500 hover:bg-blue-600 text-white transition-colors text-sm flex items-center gap-2 shadow-sm"
+                  className="px-5 py-2.5 rounded-xl font-medium bg-purple-500 hover:bg-[#7e57c2] text-white transition-colors text-sm flex items-center gap-2 shadow-sm"
                 >
                   Save Changes
                 </button>

@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, XCircle, RefreshCcw, CalendarDays, Loader2, AlertCircle } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, RefreshCcw, CalendarDays, Loader2, AlertCircle, Eye, Ban } from 'lucide-react';
 
 const getStatusConfig = (status) => {
   switch (status) {
@@ -14,7 +14,7 @@ const getLeaveTypeBgClass = (typeName) => {
   if (!typeName) return 'bg-purple-500';
   const lower = typeName.toLowerCase();
   if (lower.includes('casual')) return 'bg-purple-500';
-  if (lower.includes('sick')) return 'bg-blue-500';
+  if (lower.includes('sick')) return 'bg-purple-500';
   if (lower.includes('maternity') || lower.includes('paternity')) return 'bg-pink-500';
   if (lower.includes('compensatory')) return 'bg-green-500';
   return 'bg-purple-500';
@@ -25,7 +25,7 @@ const formatTime = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 };
 
-export default function LeaveHistoryTable({ loadingLeaves, filteredLeaves, statusFilter, typeFilter, setWithdrawTarget, isWithdrawing }) {
+export default function LeaveHistoryTable({ loadingLeaves, filteredLeaves, statusFilter, typeFilter, setWithdrawTarget, isWithdrawing, handleAdjust, isAdjusting, user, onViewDetails }) {
   if (loadingLeaves) {
     return (
       <div className="flex justify-center py-16">
@@ -85,6 +85,21 @@ export default function LeaveHistoryTable({ loadingLeaves, filteredLeaves, statu
             const dateRange = req.start_date === req.end_date ? startFmt : `${startFmt} – ${endFmt}`;
             const typeClass = getLeaveTypeBgClass(req.leave_types?.name);
 
+            const currentPaid = req.paid_days !== null ? req.paid_days : req.total_days;
+            const hasUnpaid = req.total_days > currentPaid;
+            const canAdjust = hasUnpaid && user?.available_leaves > 0 && (req.status === 'pending' || req.status === 'approved');
+            
+            let showAdjust = false;
+            if (canAdjust) {
+                const now = new Date();
+                const leaveStart = new Date(req.start_date);
+                if (leaveStart.getMonth() === now.getMonth() && leaveStart.getFullYear() === now.getFullYear()) {
+                    const diffTime = now.getTime() - leaveStart.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                    if (diffDays <= 8) showAdjust = true;
+                }
+            }
+
             return (
               <tr key={req.id} className="hover:bg-purple-50/50 transition-colors group">
                 <td className="px-5 py-4">
@@ -104,9 +119,9 @@ export default function LeaveHistoryTable({ loadingLeaves, filteredLeaves, statu
                   </div>
                 </td>
                 <td className="px-5 py-4 text-gray-500 max-w-[160px] truncate" title={cleanReason}>{cleanReason}</td>
-                <td className="px-5 py-4 text-[11px] text-gray-500">
-                  <div className="space-y-1">
-                    <div><span className="font-semibold">Applied:</span> {submitDate}</div>
+                <td className="px-5 py-4 text-sm text-gray-600">
+                  <div className="space-y-1.5 bg-gray-50/50 p-2 rounded border border-gray-100">
+                    <div><span className="font-semibold text-gray-700">Applied:</span> {submitDate}</div>
                     {approvedDate && <div><span className="font-semibold text-emerald-600">Approved:</span> {approvedDate}</div>}
                     {rejectedDate && <div><span className="font-semibold text-red-600">Rejected:</span> {rejectedDate}</div>}
                     {withdrawReqDate && <div><span className="font-semibold text-orange-600">Withdraw Req:</span> {withdrawReqDate}</div>}
@@ -117,19 +132,45 @@ export default function LeaveHistoryTable({ loadingLeaves, filteredLeaves, statu
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${sc.cls}`}>
                     <StatusIcon className="w-3 h-3" />{sc.label}
                   </span>
-                  {req.admin_note && <p className="text-[10px] mt-1 text-gray-400 italic truncate max-w-[120px]">{req.admin_note}</p>}
+                  {req.admin_note && (
+                    <div className="mt-2 text-sm text-gray-700 bg-gray-50/80 p-2.5 rounded-lg border border-gray-100 shadow-sm">
+                      <span className="font-semibold text-gray-900 block mb-0.5 text-xs">Admin Note:</span>
+                      {req.admin_note}
+                    </div>
+                  )}
                 </td>
 
                 <td className="px-5 py-4">
-                  {(req.status === 'pending' || req.status === 'approved') && (
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
-                      onClick={() => setWithdrawTarget(req)}
-                      disabled={isWithdrawing}
-                      className="text-xs text-red-500 hover:bg-red-50 px-2 py-1.5 rounded-md font-medium transition-colors"
+                      onClick={() => onViewDetails(req)}
+                      className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 hover:text-purple-800 transition-colors border border-purple-100 shadow-sm"
                     >
-                      Withdraw
+                      <Eye className="w-3.5 h-3.5" />
+                      Details
                     </button>
-                  )}
+                    {(req.status === 'pending' || req.status === 'approved') && (
+                      <button
+                        onClick={() => setWithdrawTarget(req)}
+                        disabled={isWithdrawing}
+                        className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 hover:text-red-700 transition-colors border border-red-100 shadow-sm disabled:opacity-50"
+                      >
+                        <Ban className="w-3.5 h-3.5" />
+                        Withdraw
+                      </button>
+                    )}
+                    {showAdjust && (
+                      <button
+                        onClick={() => handleAdjust(req.id)}
+                        disabled={isAdjusting}
+                        className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-800 transition-colors border border-blue-100 shadow-sm disabled:opacity-50"
+                        title="Use your available balance to make this leave Paid"
+                      >
+                        {isAdjusting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCcw className="w-3.5 h-3.5" />}
+                        Make Paid
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             );

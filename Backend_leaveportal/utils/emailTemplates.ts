@@ -1,4 +1,4 @@
-export const leaveAppliedAdminTemplate = (employeeName: string, totalDays: number, startDate: string, endDate: string, reason: string) => `
+export const leaveAppliedAdminTemplate = (employeeName: string, durationText: string, startDate: string, endDate: string, reason: string) => `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
     <h2 style="color: #2c3e50;">New Leave Request</h2>
     <p>Hello Admin,</p>
@@ -6,7 +6,7 @@ export const leaveAppliedAdminTemplate = (employeeName: string, totalDays: numbe
     <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
         <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Duration:</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${totalDays} day(s)</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${durationText}</td>
         </tr>
         <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>From:</strong></td>
@@ -28,7 +28,7 @@ export const leaveAppliedAdminTemplate = (employeeName: string, totalDays: numbe
 </div>
 `;
 
-export const leaveAppliedEmployeeTemplate = (employeeName: string, totalDays: number, startDate: string, endDate: string, reason: string) => `
+export const leaveAppliedEmployeeTemplate = (employeeName: string, durationText: string, startDate: string, endDate: string, reason: string) => `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
     <h2 style="color: #2c3e50;">Leave Application Submitted</h2>
     <p>Dear ${employeeName},</p>
@@ -36,7 +36,7 @@ export const leaveAppliedEmployeeTemplate = (employeeName: string, totalDays: nu
     <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
         <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Duration:</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${totalDays} day(s)</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${durationText}</td>
         </tr>
         <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>From:</strong></td>

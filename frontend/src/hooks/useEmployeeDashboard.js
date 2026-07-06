@@ -49,7 +49,9 @@ export function useEmployeeDashboard() {
     daysTakenThisMonth,
     inProbation,
     firstName: profile?.full_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || 'Employee',
-    greeting: getGreeting()
+    greeting: getGreeting(),
+    available_leaves: profile?.available_leaves || 0,
+    total_leaves: profile?.total_leaves || 0
   };
 }
 

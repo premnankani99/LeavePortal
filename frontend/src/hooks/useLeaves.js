@@ -21,9 +21,14 @@ export const useMyBalances = () => {
   return useQuery({
     queryKey: ['leave_balances', user?.id],
     queryFn: async () => {
-      if (!user) return [];
-      // Mocked for now, as we moved logic to Prisma profiles
-      return [];
+      if (!user) return 0;
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error("Failed to fetch balance");
+      const data = await res.json();
+      return data.user?.available_leaves || 0;
     },
     enabled: !!user
   });
@@ -48,8 +53,7 @@ export const useMyRequests = () => {
         leave_types: { name: req.leave_type }
       }));
     },
-    enabled: !!user,
-    refetchInterval: 5000
+    enabled: !!user
   });
 };
 
@@ -78,6 +82,7 @@ export const useCreateRequest = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leave_requests', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['admin_all_requests'] });
+      queryClient.invalidateQueries({ queryKey: ['leave_balances', user?.id] });
     }
   });
 };
@@ -103,6 +108,7 @@ export const useWithdrawRequest = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leave_requests', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['admin_all_requests'] });
+      queryClient.invalidateQueries({ queryKey: ['leave_balances', user?.id] });
     }
   });
 };
@@ -112,6 +118,7 @@ export const useWithdrawRequest = () => {
 // ==========================================
 
 export const useAllRequests = () => {
+  const { user } = useAuth();
   return useQuery({
     queryKey: ['admin_all_requests'],
     queryFn: async () => {
@@ -127,6 +134,7 @@ export const useAllRequests = () => {
         leave_types: { name: req.leave_type }
       }));
     },
+    enabled: user?.role === 'admin' || user?.role === 'hr',
     refetchInterval: 5000
   });
 };
@@ -150,12 +158,14 @@ export const useUpdateRequestStatus = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin_all_requests'] });
+      queryClient.invalidateQueries({ queryKey: ['leave_balances'] });
     }
   });
 };
 
 // Admin Verification
 export const usePendingVerifications = () => {
+  const { user } = useAuth();
   return useQuery({
     queryKey: ['admin_pending_verifications'],
     queryFn: async () => {
@@ -166,11 +176,13 @@ export const usePendingVerifications = () => {
       if (!res.ok) throw new Error("Failed to fetch pending verifications");
       return res.json();
     },
+    enabled: user?.role === 'admin' || user?.role === 'hr',
     refetchInterval: 5000
   });
 };
 
 export const useVerifiedEmployees = () => {
+  const { user } = useAuth();
   return useQuery({
     queryKey: ['admin_verified_employees'],
     queryFn: async () => {
@@ -181,7 +193,8 @@ export const useVerifiedEmployees = () => {
       if (!res.ok) throw new Error("Failed to fetch verified employees");
       return res.json();
     },
-    refetchInterval: 5000
+    enabled: user?.role === 'admin' || user?.role === 'hr',
+    refetchInterval: 10000
   });
 };
 
@@ -205,6 +218,53 @@ export const useUpdateVerification = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin_pending_verifications'] });
       queryClient.invalidateQueries({ queryKey: ['admin_verified_employees'] });
+    }
+  });
+};
+
+export const useAdminCreateRequestOnBehalf = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (requestData) => {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/leaves/admin/apply-on-behalf`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(requestData)
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to apply leave on behalf");
+      }
+      return res.json();
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries(['admin-leaves']);
+      queryClient.invalidateQueries(['employeeDetails', variables.employee_id]);
+    }
+  });
+};
+
+export const useAdjustLeave = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ leaveId }) => {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/leaves/adjust-unpaid`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ leaveId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to adjust leave');
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my_leaves'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
     }
   });
 };

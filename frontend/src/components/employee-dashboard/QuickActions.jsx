@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { PlusCircle, User } from 'lucide-react';
+import { PlusCircle, User, CalendarDays, Wallet } from 'lucide-react';
 
 export default function QuickActions() {
   const actions = [
@@ -9,15 +9,15 @@ export default function QuickActions() {
       icon: PlusCircle,
       link: '/apply-leave',
       bg: 'bg-purple-50 hover:bg-purple-100 border-purple-200 text-purple-700',
-      iconBg: 'bg-purple-200 text-purple-600'
+      iconBg: 'bg-purple-200 text-[#7e57c2]'
     },
     {
-      title: 'My Profile',
-      desc: 'View your details',
-      icon: User,
-      link: '/profile',
-      bg: 'bg-green-50 hover:bg-green-100 border-green-200 text-green-700',
-      iconBg: 'bg-green-200 text-green-600'
+      title: 'Leave Balance',
+      desc: 'Check available leaves',
+      icon: Wallet,
+      link: '/my-comp-offs',
+      bg: 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700',
+      iconBg: 'bg-blue-200 text-blue-600'
     }
   ];
 
@@ -25,6 +25,7 @@ export default function QuickActions() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
       {actions.map((action, idx) => {
         const Icon = action.icon;
+        
         return (
           <Link 
             key={idx} 

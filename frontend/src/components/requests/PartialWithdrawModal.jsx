@@ -25,6 +25,13 @@ export default function PartialWithdrawModal({ leave, onClose, onConfirm, isProc
     const generatedDates = [];
     
     while (current <= end) {
+      const dayOfWeek = current.getDay();
+      // Skip weekends (0 = Sunday, 6 = Saturday)
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        current.setDate(current.getDate() + 1);
+        continue;
+      }
+
       const dateStr = current.toISOString().split('T')[0];
       
       // Determine if locked

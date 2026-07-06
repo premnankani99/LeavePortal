@@ -35,7 +35,7 @@ export default function DashboardHeader({ pendingVerifsCount }) {
           {firstName} <span className="inline-block animate-bounce origin-bottom-right">👋</span>
         </h1>
         <p className="text-purple-100 text-sm mt-2 animate-in fade-in slide-in-from-left-4 duration-700 delay-200">
-          Welcome to the Leave Portal Administration Dashboard.
+          Welcome to the Leave Portal {user?.role === 'hr' ? 'HR' : 'Administration'} Dashboard
         </p>
       </div>
       

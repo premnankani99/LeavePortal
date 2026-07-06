@@ -1,4 +1,5 @@
 import { Bell } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function NotificationsList({ notificationsList }) {
   return (
@@ -6,8 +7,13 @@ export default function NotificationsList({ notificationsList }) {
       <div className="flex-1 overflow-y-auto flex flex-col">
         {notificationsList.map((notif, index) => {
           const Icon = notif.icon;
+          const Wrapper = notif.link ? Link : 'div';
           return (
-            <div key={notif.id} className={`p-6 flex items-start gap-5 transition-colors ${index !== notificationsList.length - 1 ? 'border-b border-gray-100' : ''} ${notif.isUnread ? 'bg-blue-50/30' : 'hover:bg-gray-50'}`}>
+            <Wrapper 
+              to={notif.link}
+              key={notif.id} 
+              className={`p-6 flex items-start gap-5 transition-colors ${index !== notificationsList.length - 1 ? 'border-b border-gray-100' : ''} ${notif.isUnread ? 'bg-purple-50/30' : 'hover:bg-gray-50'}`}
+            >
               <div className={`p-3 rounded-full ${notif.iconBg}`}>
                 <Icon className="w-6 h-6" />
               </div>
@@ -18,7 +24,7 @@ export default function NotificationsList({ notificationsList }) {
                 </div>
                 <p className="text-base text-gray-600 mt-1">{notif.message}</p>
               </div>
-            </div>
+            </Wrapper>
           );
         })}
         {notificationsList.length === 0 && (

@@ -2,7 +2,10 @@ import * as z from 'zod';
 
 export const leaveSchema = z.object({
   leave_type_id: z.string().min(1, "Please select a leave type"),
-  dates: z.array(z.any()).min(1, "Please select at least one date"),
+  dates: z.any().refine(val => {
+    if (Array.isArray(val)) return val.length > 0;
+    return val != null && val !== '';
+  }, "Please select at least one date"),
   reason: z.string().min(5, "Reason must be at least 5 characters long"),
   emergency_contact: z.string().optional(),
   is_half_day: z.boolean().optional(),

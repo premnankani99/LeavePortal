@@ -20,7 +20,7 @@ export default function AdminDashboard() {
       <DashboardHeader pendingVerifsCount={pendingVerifs.length} />
       <KpiCards kpis={kpis} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 flex-1">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <RequestBreakdown 
           allRequests={allRequests}
           approvedRequests={approvedRequests}

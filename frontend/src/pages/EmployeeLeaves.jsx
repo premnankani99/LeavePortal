@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { useEmployeeLeaves } from '../hooks/useEmployeeLeaves';
 import PartialWithdrawModal from '../components/requests/PartialWithdrawModal';
 import LeaveHistoryHeader from '../components/employee-leaves/LeaveHistoryHeader';
 import LeaveHistoryTable from '../components/employee-leaves/LeaveHistoryTable';
+import LeaveDetailsModal from '../components/requests/LeaveDetailsModal';
 
 export default function EmployeeLeaves() {
+  const [selectedLeave, setSelectedLeave] = useState(null);
   const {
     loadingLeaves,
     leaveTypes,
@@ -15,6 +18,9 @@ export default function EmployeeLeaves() {
     withdrawTarget,
     setWithdrawTarget,
     handleWithdraw,
+    handleAdjust,
+    adjustMutation,
+    user,
     filteredLeaves
   } = useEmployeeLeaves();
 
@@ -27,6 +33,13 @@ export default function EmployeeLeaves() {
           onClose={() => setWithdrawTarget(null)}
           onConfirm={handleWithdraw}
           isProcessing={withdrawMutation.isPending}
+        />
+      )}
+
+      {selectedLeave && (
+        <LeaveDetailsModal 
+          request={selectedLeave} 
+          onClose={() => setSelectedLeave(null)} 
         />
       )}
 
@@ -46,6 +59,10 @@ export default function EmployeeLeaves() {
           typeFilter={typeFilter}
           setWithdrawTarget={setWithdrawTarget}
           isWithdrawing={withdrawMutation.isPending}
+          handleAdjust={handleAdjust}
+          isAdjusting={adjustMutation.isPending}
+          user={user}
+          onViewDetails={setSelectedLeave}
         />
       </div>
 

@@ -21,6 +21,9 @@ export const AuthProvider = ({ children }) => {
       setRole(parsedUser.role);
       setIsVerified(parsedUser.verification_status === 'approved');
       setVerificationStatus(parsedUser.verification_status || 'pending');
+      
+      // Silently fetch fresh data in background to keep context updated
+      refreshUser();
     }
     setLoading(false);
   }, []);

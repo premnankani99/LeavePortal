@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Bell, CheckCircle2, XCircle, RefreshCcw, AlertCircle } from 'lucide-react';
+import { Bell, CheckCircle2, XCircle, RefreshCcw, AlertCircle, Gift } from 'lucide-react';
 import { useMyRequests, useAllRequests, usePendingVerifications } from './useLeaves';
+import { useMyCompOffs, usePendingCompOffRequests } from './useCompOff';
 import { useAuth } from '../context/AuthContext';
 
 // Helper to format "time ago"
@@ -23,8 +24,10 @@ function timeAgo(dateInput) {
 export const useNotifications = () => {
   const { role, user } = useAuth();
   const { data: myLeaves = [], isLoading: loadingMy } = useMyRequests();
+  const { data: myCompOffs = [], isLoading: loadingCompOffs } = useMyCompOffs();
   const { data: allRequests = [], isLoading: loadingAll } = useAllRequests();
   const { data: pendingVerifications = [], isLoading: loadingVerif } = usePendingVerifications();
+  const { data: pendingCompOffs = [], isLoading: loadingPendingCompOffs } = usePendingCompOffRequests();
 
   const [lastReadTime, setLastReadTime] = useState(() => {
     return user ? Number(localStorage.getItem(`notif_read_${user.id}`) || '0') : 0;
@@ -41,7 +44,7 @@ export const useNotifications = () => {
   const notificationsList = useMemo(() => {
     const notifs = [];
 
-    if (role === 'admin') {
+    if (role === 'admin' || role === 'hr') {
       // 1. Pending Leave Requests
       allRequests.forEach(leave => {
         const type = leave.leave_types?.name || 'Leave';
@@ -57,8 +60,9 @@ export const useNotifications = () => {
             timeDate: tDate,
             time: timeAgo(leave.created_at),
             icon: Bell,
-            iconBg: 'bg-blue-100 text-blue-600',
-            isUnread: tDate.getTime() > lastReadTime
+            iconBg: 'bg-purple-100 text-[#7e57c2]',
+            isUnread: tDate.getTime() > lastReadTime,
+            link: '/admin/leave-queue'
           });
         }
 
@@ -73,7 +77,8 @@ export const useNotifications = () => {
             time: timeAgo(dTime),
             icon: AlertCircle,
             iconBg: 'bg-orange-100 text-orange-600',
-            isUnread: tDate.getTime() > lastReadTime
+            isUnread: tDate.getTime() > lastReadTime,
+            link: '/admin/leave-queue'
           });
         }
       });
@@ -89,7 +94,24 @@ export const useNotifications = () => {
           time: timeAgo(emp.created_at),
           icon: AlertCircle,
           iconBg: 'bg-yellow-100 text-yellow-600',
-          isUnread: tDate.getTime() > lastReadTime
+          isUnread: tDate.getTime() > lastReadTime,
+          link: '/admin/verification-queue'
+        });
+      });
+
+      // 3. Pending Comp-Off Requests
+      pendingCompOffs.forEach(req => {
+        const tDate = new Date(req.grantedAt || new Date());
+        notifs.push({
+          id: `compoffreq_${req.id}`,
+          title: 'Pending Comp-Off Request',
+          message: `${req.profiles?.full_name || req.profiles?.email || 'An employee'} requested ${req.daysRequested} days of comp-off.`,
+          timeDate: tDate,
+          time: timeAgo(req.grantedAt || new Date()),
+          icon: Gift,
+          iconBg: 'bg-blue-100 text-blue-600',
+          isUnread: tDate.getTime() > lastReadTime,
+          link: '/admin/comp-off'
         });
       });
 
@@ -109,7 +131,8 @@ export const useNotifications = () => {
             time: timeAgo(leave.approved_at),
             icon: CheckCircle2,
             iconBg: 'bg-emerald-100 text-emerald-600',
-            isUnread: tDate.getTime() > lastReadTime
+            isUnread: tDate.getTime() > lastReadTime,
+            link: '/leaves'
           });
         }
 
@@ -123,7 +146,8 @@ export const useNotifications = () => {
             time: timeAgo(leave.rejected_at),
             icon: XCircle,
             iconBg: 'bg-red-100 text-red-600',
-            isUnread: tDate.getTime() > lastReadTime
+            isUnread: tDate.getTime() > lastReadTime,
+            link: '/leaves'
           });
         }
 
@@ -137,7 +161,8 @@ export const useNotifications = () => {
             time: timeAgo(leave.withdrawn_at),
             icon: RefreshCcw,
             iconBg: 'bg-gray-100 text-gray-600',
-            isUnread: tDate.getTime() > lastReadTime
+            isUnread: tDate.getTime() > lastReadTime,
+            link: '/leaves'
           });
         }
         
@@ -155,6 +180,20 @@ export const useNotifications = () => {
           });
         }
       });
+
+      myCompOffs.forEach(comp => {
+        const tDate = new Date(comp.grantedAt);
+        notifs.push({
+          id: `compoff_${comp.id}`,
+          title: 'Comp-Off Granted! 🎉',
+          message: `Admin granted you ${comp.daysGranted} day(s) of comp-off. Reason: ${comp.reason}`,
+          timeDate: tDate,
+          time: timeAgo(comp.grantedAt),
+          icon: CheckCircle2,
+          iconBg: 'bg-blue-100 text-blue-600',
+          isUnread: tDate.getTime() > lastReadTime
+        });
+      });
     }
 
     // Add static welcome notification
@@ -165,16 +204,21 @@ export const useNotifications = () => {
       timeDate: new Date(0), // Oldest
       time: 'A while ago',
       icon: Bell,
-      iconBg: 'bg-purple-100 text-purple-600',
+      iconBg: 'bg-purple-100 text-[#7e57c2]',
       isUnread: false
     });
 
     // Sort by newest first
     return notifs.sort((a, b) => b.timeDate - a.timeDate);
-  }, [myLeaves, allRequests, pendingVerifications, role, user, lastReadTime]);
+  }, [myLeaves, allRequests, pendingVerifications, pendingCompOffs, role, user, lastReadTime]);
+
+  const pendingLeavesCount = allRequests.filter(r => r.status === 'pending' || r.status === 'withdrawal_requested').length;
+  const pendingVerificationCount = pendingVerifications.length;
 
   return {
     notificationsList,
-    isLoading: role === 'admin' ? (loadingAll || loadingVerif) : loadingMy
+    pendingLeavesCount,
+    pendingVerificationCount,
+    isLoading: role === 'admin' ? (loadingAll || loadingVerif || loadingPendingCompOffs) : (loadingMy || loadingCompOffs)
   };
 };

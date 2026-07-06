@@ -11,7 +11,9 @@ export default function Profile() {
     joinedStr,
     inProbation,
     approvedLeaves,
-    pendingLeaves
+    pendingLeaves,
+    rejectedLeaves,
+    withdrawnLeaves
   } = useProfile();
 
   return (
@@ -32,6 +34,8 @@ export default function Profile() {
               myLeavesLength={myLeaves.length}
               approvedLeaves={approvedLeaves}
               pendingLeaves={pendingLeaves}
+              rejectedLeaves={rejectedLeaves}
+              withdrawnLeaves={withdrawnLeaves}
             />
           )}
 

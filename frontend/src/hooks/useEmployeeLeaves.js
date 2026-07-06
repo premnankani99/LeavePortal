@@ -1,12 +1,16 @@
 import { useState, useMemo } from 'react';
-import { useMyRequests, useLeaveTypes, useWithdrawRequest } from './useLeaves';
+import { useMyRequests, useLeaveTypes, useWithdrawRequest, useAdjustLeave } from './useLeaves';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 
 export const useEmployeeLeaves = () => {
   const { data: myLeaves = [], isLoading: loadingLeaves } = useMyRequests();
   const { data: leaveTypes = [] } = useLeaveTypes();
   const withdrawMutation = useWithdrawRequest();
+  const adjustMutation = useAdjustLeave();
   const toast = useToast();
+  const { user } = useAuth();
+
   
   const [statusFilter, setStatusFilter] = useState('All');
   const [typeFilter, setTypeFilter] = useState('All');
@@ -26,6 +30,13 @@ export const useEmployeeLeaves = () => {
     }
   };
 
+  const handleAdjust = (leaveId) => {
+    adjustMutation.mutate({ leaveId }, {
+      onSuccess: () => toast.success("Leave adjusted to Paid successfully!"),
+      onError: (err) => toast.error(err.message)
+    });
+  };
+
   const filteredLeaves = useMemo(() => {
     return myLeaves.filter(req => {
       const matchStatus = statusFilter === 'All' || req.status === statusFilter.toLowerCase();
@@ -38,6 +49,8 @@ export const useEmployeeLeaves = () => {
     loadingLeaves,
     leaveTypes,
     withdrawMutation,
+    adjustMutation,
+    user,
     statusFilter,
     setStatusFilter,
     typeFilter,
@@ -45,6 +58,7 @@ export const useEmployeeLeaves = () => {
     withdrawTarget,
     setWithdrawTarget,
     handleWithdraw,
+    handleAdjust,
     filteredLeaves
   };
 };
