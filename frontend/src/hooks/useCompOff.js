@@ -19,7 +19,7 @@ export const useGrantCompOff = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ employeeId, daysGranted, reason }) => {
+    mutationFn: async ({ employeeId, daysGranted, reason, workedDates }) => {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/api/admin/comp-off/grant`, {
         method: 'POST',
@@ -27,7 +27,7 @@ export const useGrantCompOff = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` 
         },
-        body: JSON.stringify({ employeeId, daysGranted, reason })
+        body: JSON.stringify({ employeeId, daysGranted, reason, workedDates })
       });
       if (!res.ok) {
         const errorData = await res.json().catch(() => null);
@@ -60,7 +60,7 @@ export const useRequestCompOff = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ daysRequested, reason }) => {
+    mutationFn: async ({ daysRequested, reason, workedDates }) => {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/api/leaves/compoff/request`, {
         method: 'POST',
@@ -68,7 +68,7 @@ export const useRequestCompOff = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` 
         },
-        body: JSON.stringify({ total_days: daysRequested, reason })
+        body: JSON.stringify({ total_days: daysRequested, reason, workedDates })
       });
       if (!res.ok) {
         const errorData = await res.json().catch(() => null);
@@ -91,8 +91,7 @@ export const usePendingCompOffRequests = () => {
       });
       if (!res.ok) throw new Error("Failed to fetch pending requests");
       return res.json();
-    },
-    refetchInterval: 5000
+    }
   });
 };
 

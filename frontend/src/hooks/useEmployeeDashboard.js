@@ -37,10 +37,9 @@ export function useEmployeeDashboard() {
   const monthsSinceJoining = (diffYears * 12) + diffMonths;
   const inProbation = monthsSinceJoining < 6;
 
-  // We'd ideally fetch this specific data from backend, but mock it based on stats for now if needed.
-  // Assuming daysTakenThisMonth could be derived if we had all leaves, but for UI sake we mock it or set 0.
-  const daysTakenThisMonth = 0; 
-  const availablePaid = Math.max(0, 1 - daysTakenThisMonth);
+  // The available leaves balance directly from the DB
+  const availablePaid = profile?.available_leaves || 0;
+  const daysTakenThisMonth = 0; // Keeping this if used elsewhere in UI
 
   return {
     stats,

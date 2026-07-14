@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Eye } from 'lucide-react';
 import LeaveDetailsModal from './LeaveDetailsModal';
+import { formatActiveDateRanges } from '../../utils/dateUtils';
 
 const formatTime = (dateString) => {
   if (!dateString) return null;
@@ -38,7 +39,7 @@ export default function ProcessedHistory({ processedRequests }) {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {processedRequests.map(req => {
-                    const datesReq = `${new Date(req.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}${req.start_date !== req.end_date ? ` - ${new Date(req.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}`;
+                    const datesReq = formatActiveDateRanges(req.start_date, req.end_date, req.withdrawn_dates);
                     
                     const submitDate = formatTime(req.created_at);
                     const approvedDate = formatTime(req.approved_at);

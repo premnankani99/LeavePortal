@@ -8,6 +8,7 @@ import { useToast } from '../../context/ToastContext';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Loader2, Gift } from 'lucide-react';
+import { Controller } from 'react-hook-form';
 
 const compOffSchema = z.object({
   employeeId: z.string().min(1, "Please select an employee"),
@@ -15,6 +16,7 @@ const compOffSchema = z.object({
     .min(0.5, "Minimum grant is 0.5 days")
     .max(30, "Maximum grant is 30 days")
     .step(0.5, "Must be a multiple of 0.5"),
+  workedDates: z.array(z.string().min(1, "Date is required")),
   reason: z.string().min(5, "Please provide a valid reason (min 5 chars)")
 });
 
@@ -23,11 +25,12 @@ export default function GrantCompOffCard() {
   const grantMutation = useGrantCompOff();
   const toast = useToast();
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const { register, control, handleSubmit, formState: { errors }, reset, setValue, getValues } = useForm({
     resolver: zodResolver(compOffSchema),
     defaultValues: {
       employeeId: '',
       daysGranted: 1,
+      workedDates: [''],
       reason: ''
     }
   });
@@ -73,14 +76,58 @@ export default function GrantCompOffCard() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Days to Grant</label>
-            <input 
-              type="number"
-              step="0.5"
-              {...register('daysGranted', { valueAsNumber: true })}
-              className={`w-full px-3 py-2 border rounded-md shadow-sm text-sm focus:ring-purple-500 focus:border-purple-500 ${errors.daysGranted ? 'border-red-500' : 'border-gray-300'}`}
-              placeholder="e.g. 1.5"
+            <Controller
+              name="daysGranted"
+              control={control}
+              render={({ field }) => (
+                <input 
+                  type="number"
+                  step="0.5"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(parseFloat(e.target.value));
+                    const days = parseFloat(e.target.value) || 1;
+                    const numDates = Math.ceil(days);
+                    const currentDates = getValues('workedDates') || [];
+                    if (currentDates.length < numDates) {
+                        setValue('workedDates', [...currentDates, ...Array(numDates - currentDates.length).fill('')]);
+                    } else if (currentDates.length > numDates) {
+                        setValue('workedDates', currentDates.slice(0, numDates));
+                    }
+                  }}
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm text-sm focus:ring-purple-500 focus:border-purple-500 ${errors.daysGranted ? 'border-red-500' : 'border-gray-300'}`}
+                  placeholder="e.g. 1.5"
+                />
+              )}
             />
             {errors.daysGranted && <p className="text-red-500 text-xs mt-1">{errors.daysGranted.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Worked Dates (Overtime Dates)</label>
+            <Controller
+              name="workedDates"
+              control={control}
+              render={({ field }) => (
+                <div className="space-y-2">
+                  {field.value.map((_, index) => (
+                    <input 
+                      key={index}
+                      type="date"
+                      value={field.value[index] || ''}
+                      onChange={(e) => {
+                        const newDates = [...field.value];
+                        newDates[index] = e.target.value;
+                        field.onChange(newDates);
+                      }}
+                      max={new Date().toISOString().split('T')[0]}
+                      className={`w-full px-3 py-2 border rounded-md shadow-sm text-sm focus:ring-purple-500 focus:border-purple-500 ${errors.workedDates ? 'border-red-500' : 'border-gray-300'}`}
+                    />
+                  ))}
+                </div>
+              )}
+            />
+            {errors.workedDates && <p className="text-red-500 text-xs mt-1">All dates are required</p>}
           </div>
 
           <div>

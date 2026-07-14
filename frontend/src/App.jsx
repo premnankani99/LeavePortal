@@ -24,6 +24,7 @@ import AdminApplyLeave from './pages/AdminApplyLeave';
 import Holidays from './pages/Holidays';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications';
+import LeaveCalendar from './pages/LeaveCalendar';
 import HRDashboard from './pages/hr/HRDashboard';
 import HREmployees from './pages/hr/HREmployees';
 import HREmployeeDetail from './pages/hr/HREmployeeDetail';
@@ -31,7 +32,15 @@ import HRLeaveHistory from './pages/hr/HRLeaveHistory';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Component to protect routes
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // Prevents "baar baar api call" when switching tabs
+      retry: 1, // Reduces red marks in network tab (fails fast instead of retrying 3 times)
+      staleTime: 5 * 60 * 1000, // Caches data for 5 minutes
+    },
+  },
+});
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, role, isVerified } = useAuth();
   
@@ -117,6 +126,7 @@ function App() {
                 <Route path="/admin/verification-queue" element={<ProtectedRoute allowedRoles={['admin', 'hr']}><Layout><AdminVerificationQueue /></Layout></ProtectedRoute>} />
                 <Route path="/admin/comp-off" element={<ProtectedRoute allowedRoles={['admin', 'hr']}><Layout><AdminCompOff /></Layout></ProtectedRoute>} />
                 <Route path="/admin/apply-leave" element={<ProtectedRoute allowedRoles={['admin', 'hr']}><Layout><AdminApplyLeave /></Layout></ProtectedRoute>} />
+                <Route path="/admin/away" element={<ProtectedRoute allowedRoles={['admin', 'hr']}><Layout><LeaveCalendar /></Layout></ProtectedRoute>} />
 
                 {/* HR Routes */}
                 <Route path="/hr/dashboard" element={
@@ -134,9 +144,14 @@ function App() {
                     <Layout><HREmployeeDetail /></Layout>
                   </ProtectedRoute>
                 } />
-                <Route path="/hr/leaves" element={
+                <Route path="/hr/history" element={
                   <ProtectedRoute allowedRoles={['hr']}>
                     <Layout><HRLeaveHistory /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/hr/away" element={
+                  <ProtectedRoute allowedRoles={['admin', 'hr']}>
+                    <Layout><LeaveCalendar /></Layout>
                   </ProtectedRoute>
                 } />
 

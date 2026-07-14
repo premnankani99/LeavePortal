@@ -9,6 +9,7 @@ import { Button } from '../ui/button';
 
 const schema = z.object({
   daysRequested: z.coerce.number().min(0.5, "Minimum 0.5 days").max(10, "Maximum 10 days"),
+  workedDates: z.array(z.string().min(1, "Date is required")),
   reason: z.string().min(5, "Reason must be at least 5 characters")
 });
 
@@ -16,10 +17,11 @@ export default function RequestCompOffModal({ isOpen, onClose }) {
   const { mutate: requestCompOff, isPending } = useRequestCompOff();
   const toast = useToast();
 
-  const { control, handleSubmit, formState: { errors }, reset } = useForm({
+  const { control, handleSubmit, formState: { errors }, reset, setValue, getValues } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       daysRequested: 1,
+      workedDates: [''],
       reason: ''
     }
   });
@@ -27,7 +29,12 @@ export default function RequestCompOffModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const onSubmit = (data) => {
-    requestCompOff(data, {
+    const payload = {
+      daysRequested: data.daysRequested,
+      reason: data.reason,
+      workedDates: data.workedDates
+    };
+    requestCompOff(payload, {
       onSuccess: () => {
         toast.success("Comp-Off request submitted successfully!");
         reset();
@@ -67,11 +74,49 @@ export default function RequestCompOffModal({ isOpen, onClose }) {
                   type="number" 
                   step="0.5"
                   {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    const days = parseFloat(e.target.value) || 1;
+                    const numDates = Math.ceil(days);
+                    const currentDates = getValues('workedDates') || [];
+                    if (currentDates.length < numDates) {
+                        setValue('workedDates', [...currentDates, ...Array(numDates - currentDates.length).fill('')]);
+                    } else if (currentDates.length > numDates) {
+                        setValue('workedDates', currentDates.slice(0, numDates));
+                    }
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7e57c2] focus:border-transparent outline-none transition-all"
                 />
               )}
             />
             {errors.daysRequested && <p className="text-xs text-red-500 mt-1">{errors.daysRequested.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Worked Dates (Overtime Dates)</label>
+            <Controller
+              name="workedDates"
+              control={control}
+              render={({ field }) => (
+                <div className="space-y-2">
+                  {field.value.map((_, index) => (
+                    <input 
+                      key={index}
+                      type="date" 
+                      value={field.value[index] || ''}
+                      onChange={(e) => {
+                        const newDates = [...field.value];
+                        newDates[index] = e.target.value;
+                        field.onChange(newDates);
+                      }}
+                      max={new Date().toISOString().split('T')[0]} // Cannot be in future
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7e57c2] focus:border-transparent outline-none transition-all"
+                    />
+                  ))}
+                </div>
+              )}
+            />
+            {errors.workedDates && <p className="text-xs text-red-500 mt-1">All dates are required</p>}
           </div>
 
           <div>

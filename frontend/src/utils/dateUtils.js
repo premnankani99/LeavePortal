@@ -57,6 +57,85 @@ export const calculateMultiDateBreakdown = (selectedDates, availablePaidLeaves, 
 };
 
 /**
+ * Format date range grouping contiguous active days and comma-separating disjoint ranges.
+ * e.g., "Jul 14 - Jul 15, Jul 17"
+ */
+export const formatActiveDateRanges = (startDate, endDate, withdrawnDatesStr) => {
+  let withdrawn = [];
+  if (withdrawnDatesStr) {
+    if (typeof withdrawnDatesStr === 'string') {
+      try { withdrawn = JSON.parse(withdrawnDatesStr); } catch(e){}
+    } else if (Array.isArray(withdrawnDatesStr)) {
+      withdrawn = withdrawnDatesStr;
+    }
+  }
+
+  let workingDays = [];
+  let curr = new Date(startDate);
+  const finalDate = new Date(endDate);
+
+  while (curr <= finalDate) {
+    const dayOfWeek = curr.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) { // skip weekends
+      const yyyy = curr.getFullYear();
+      const mm = String(curr.getMonth() + 1).padStart(2, '0');
+      const dd = String(curr.getDate()).padStart(2, '0');
+      const isoDate = `${yyyy}-${mm}-${dd}`;
+      workingDays.push({ dateObj: new Date(curr), isoDate });
+    }
+    curr.setDate(curr.getDate() + 1);
+  }
+
+  const formatOpts = { month: 'short', day: 'numeric' };
+
+  if (workingDays.length === 0) {
+    // all weekends? Just fallback to standard
+    const s = new Date(startDate);
+    const e = new Date(endDate);
+    return `${s.toLocaleDateString('en-US', formatOpts)}${startDate !== endDate ? ` - ${e.toLocaleDateString('en-US', formatOpts)}` : ''}`;
+  }
+
+  // filter out withdrawn from workingDays
+  const activeWorkingDays = workingDays.map((wd, index) => ({...wd, index}))
+                            .filter(wd => !withdrawn.includes(wd.isoDate));
+
+  if (activeWorkingDays.length === 0) {
+    const s = new Date(startDate);
+    const e = new Date(endDate);
+    return `${s.toLocaleDateString('en-US', formatOpts)}${startDate !== endDate ? ` - ${e.toLocaleDateString('en-US', formatOpts)}` : ''}`;
+  }
+
+  const groups = [];
+  let currentGroup = [activeWorkingDays[0]];
+
+  for (let i = 1; i < activeWorkingDays.length; i++) {
+    const prev = activeWorkingDays[i - 1];
+    const currItem = activeWorkingDays[i];
+    
+    // Check if consecutive in terms of working days (indices differ by exactly 1)
+    if (currItem.index - prev.index === 1) {
+      currentGroup.push(currItem);
+    } else {
+      groups.push(currentGroup);
+      currentGroup = [currItem];
+    }
+  }
+  groups.push(currentGroup);
+
+  const formattedGroups = groups.map(group => {
+    if (group.length === 1) {
+      return group[0].dateObj.toLocaleDateString('en-US', formatOpts);
+    } else {
+      const start = group[0].dateObj.toLocaleDateString('en-US', formatOpts);
+      const end = group[group.length - 1].dateObj.toLocaleDateString('en-US', formatOpts);
+      return `${start} - ${end}`;
+    }
+  });
+
+  return formattedGroups.join(', ');
+};
+
+/**
  * Original range-based breakdown
  */
 export const calculateLeaveBreakdown = (startDate, endDate, availablePaidLeaves, holidaysList = []) => {

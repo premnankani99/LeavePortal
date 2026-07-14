@@ -88,6 +88,9 @@ export default function CompOffRequestsTable() {
                         <span className="bg-purple-50 text-[#7e57c2] px-2 py-0.5 rounded-md font-bold">{req.daysGranted}</span>
                       </p>
                       <p className="text-sm text-gray-500 mt-1">
+                        <span className="font-semibold text-gray-700">Worked Dates:</span> {req.workedDates && Array.isArray(req.workedDates) ? req.workedDates.map(d => new Date(d).toDateString()).join(', ') : 'N/A'}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
                         <span className="font-semibold text-gray-700">Reason:</span> {req.reason}
                       </p>
                       <p className="text-xs text-gray-400 mt-2">

@@ -29,7 +29,8 @@ export default function CompOffHistoryTable() {
               <tr>
                 <th className="px-4 py-3 font-medium">Employee</th>
                 <th className="px-4 py-3 font-medium">Days</th>
-                <th className="px-4 py-3 font-medium text-right">Date</th>
+                <th className="px-4 py-3 font-medium">Worked Dates</th>
+                <th className="px-4 py-3 font-medium text-right">Processed On</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -43,6 +44,9 @@ export default function CompOffHistoryTable() {
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                       +{grant.daysGranted}
                     </span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-500 max-w-[150px] truncate">
+                    {grant.workedDates && Array.isArray(grant.workedDates) ? grant.workedDates.map(d => new Date(d).toDateString()).join(', ') : 'N/A'}
                   </td>
                   <td className="px-4 py-3 text-right text-gray-500">
                     {new Date(grant.updatedAt || grant.grantedAt).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}

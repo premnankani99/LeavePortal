@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
-import { UserCheck, Loader2, X, AlertCircle } from 'lucide-react';
+import { UserCheck, Loader2, X, AlertCircle, Lock } from 'lucide-react';
+import { formatActiveDateRanges } from '../../utils/dateUtils';
+import { useAuth } from '../../context/AuthContext';
 
 export default function LeaveApprovalQueue({ 
   pendingRequests, 
@@ -12,6 +14,7 @@ export default function LeaveApprovalQueue({
   isProcessingRequest 
 }) {
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const { user } = useAuth();
 
   const handleAction = (id, action) => {
     const success = onAction(id, action);
@@ -46,7 +49,7 @@ export default function LeaveApprovalQueue({
                     sessionDisplay = `Half Day (${match[1] === 'Morning' ? 'AM' : 'PM'})`;
                   }
                 }
-                const datesReq = `${new Date(req.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}${req.start_date !== req.end_date ? ` - ${new Date(req.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}`;
+                const datesReq = formatActiveDateRanges(req.start_date, req.end_date, req.withdrawn_dates);
                 
                 const isUnpaid = req.leave_type?.includes('Unpaid');
                 const badgeColor = isUnpaid ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-green-100 text-green-700 border-green-200';
@@ -114,7 +117,7 @@ export default function LeaveApprovalQueue({
                   cleanReason = req.reason.replace(/\[Half-Day: .*?\]\s*/, '');
                 }
               }
-              const datesReq = `${new Date(req.start_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}${req.start_date !== req.end_date ? ` - ${new Date(req.end_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}` : ''}`;
+              const datesReq = formatActiveDateRanges(req.start_date, req.end_date, req.withdrawn_dates);
               const appliedAt = new Date(req.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
               
               const isUnpaid = req.leave_type?.includes('Unpaid');
@@ -185,49 +188,58 @@ export default function LeaveApprovalQueue({
 
                   {/* Footer / Actions */}
                   <div className="p-6 border-t border-gray-100 bg-gray-50">
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Admin Comment (Optional)</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Project deadline on Friday"
-                        value={comments[req.id] || ''}
-                        onChange={(e) => onCommentChange(req.id, e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-[#7e57c2] focus:border-[#7e57c2]"
-                      />
-                    </div>
-                    <div className="flex gap-3">
-                      {isWithdrawal ? (
-                        <>
-                          <Button 
-                            variant="outline" className="flex-1 text-red-600 border-red-200 hover:bg-red-50"
-                            onClick={() => handleAction(req.id, 'approved')} disabled={isProcessingRequest}
-                          >
-                            Reject Withdrawal
-                          </Button>
-                          <Button 
-                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
-                            onClick={() => handleAction(req.id, 'cancelled')} disabled={isProcessingRequest}
-                          >
-                            Approve Withdrawal
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button 
-                            variant="outline" className="flex-1 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                            onClick={() => handleAction(req.id, 'rejected')} disabled={isProcessingRequest}
-                          >
-                            Reject Leave
-                          </Button>
-                          <Button 
-                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                            onClick={() => handleAction(req.id, 'approved')} disabled={isProcessingRequest}
-                          >
-                            Approve Leave
-                          </Button>
-                        </>
-                      )}
-                    </div>
+                    {user?.role === 'admin' && !req.profiles?.managers?.some(m => m.id === user.id) ? (
+                      <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                        <Lock className="w-5 h-5 shrink-0" />
+                        <p className="text-sm font-medium">You cannot approve or reject this request because you are not assigned as this employee's reporting manager.</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Admin Comment (Optional)</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Project deadline on Friday"
+                            value={comments[req.id] || ''}
+                            onChange={(e) => onCommentChange(req.id, e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-[#7e57c2] focus:border-[#7e57c2]"
+                          />
+                        </div>
+                        <div className="flex gap-3">
+                          {isWithdrawal ? (
+                            <>
+                              <Button 
+                                variant="outline" className="flex-1 text-red-600 border-red-200 hover:bg-red-50"
+                                onClick={() => handleAction(req.id, 'approved')} disabled={isProcessingRequest}
+                              >
+                                Reject Withdrawal
+                              </Button>
+                              <Button 
+                                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+                                onClick={() => handleAction(req.id, 'cancelled')} disabled={isProcessingRequest}
+                              >
+                                Approve Withdrawal
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button 
+                                variant="outline" className="flex-1 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                                onClick={() => handleAction(req.id, 'rejected')} disabled={isProcessingRequest}
+                              >
+                                Reject Leave
+                              </Button>
+                              <Button 
+                                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                                onClick={() => handleAction(req.id, 'approved')} disabled={isProcessingRequest}
+                              >
+                                Approve Leave
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               );

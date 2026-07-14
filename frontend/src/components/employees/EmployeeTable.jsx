@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Users, Mail, Calendar, ShieldCheck, Loader2, Search, Trash2, Filter, AlertTriangle, X, Edit, Phone } from 'lucide-react';
+import { Users, Mail, Calendar, ShieldCheck, Loader2, Search, Trash2, Filter, AlertTriangle, X, Edit, Phone, UserCog } from 'lucide-react';
+import { useManagers } from '../../hooks/useLeaves';
+import { useAuth } from '../../context/AuthContext';
 
 // Replaced inline style array with Tailwind classes per requirements
 const AVATAR_COLORS = [
@@ -15,7 +17,9 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null); // For details modal
   const [employeeToEdit, setEmployeeToEdit] = useState(null); // For edit modal
-  const [editFormData, setEditFormData] = useState({ full_name: '', email: '', designation: '', phone: '', date_of_joining: '' });
+  const [editFormData, setEditFormData] = useState({ full_name: '', email: '', designation: '', phone: '', date_of_joining: '', toggle_manager: false });
+  const { data: managers = [] } = useManagers();
+  const { user } = useAuth();
 
   const handleEditClick = (emp) => {
     setEmployeeToEdit(emp);
@@ -24,6 +28,7 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
       email: emp.email || '',
       designation: emp.designation || '',
       phone: emp.phone || '',
+      toggle_manager: emp.managers?.some(m => m.id === user?.id) || false,
       date_of_joining: emp.date_of_joining ? new Date(emp.date_of_joining).toISOString().split('T')[0] : (emp.created_at ? new Date(emp.created_at).toISOString().split('T')[0] : '')
     });
   };
@@ -269,6 +274,10 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
                   <span className="text-sm font-medium">{selectedEmployee.phone || 'Phone number not provided'}</span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                  <UserCog className="w-5 h-5 text-gray-400 shrink-0" />
+                  <span className="text-sm font-medium">Reports to: {selectedEmployee.parent?.full_name || 'No Manager Assigned'}</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100">
                   <Calendar className="w-5 h-5 text-gray-400 shrink-0" />
                   <span className="text-sm font-medium">Joined {new Date(selectedEmployee.date_of_joining || selectedEmployee.created_at || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                 </div>
@@ -306,7 +315,7 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
                 </button>
               </div>
 
-              <div className="space-y-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                   <input 
@@ -317,7 +326,7 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
                     className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-shadow"
                   />
                 </div>
-                <div>
+                <div className="col-span-1 md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                   <input 
                     type="email" 
@@ -341,6 +350,24 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
                     <option value="Marketing">Marketing</option>
                   </select>
                 </div>
+                {user?.role === 'admin' && (
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <label className="flex items-center space-x-3 cursor-pointer mb-2">
+                      <input 
+                        type="checkbox"
+                        checked={editFormData.toggle_manager}
+                        onChange={e => setEditFormData({...editFormData, toggle_manager: e.target.checked})}
+                        className="w-5 h-5 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                      />
+                      <span className="text-sm font-medium text-gray-800">Assign me as Reporting Manager</span>
+                    </label>
+                    <div className="text-xs text-gray-500 ml-8">
+                      {employeeToEdit?.managers?.length > 0 
+                        ? `Currently managed by: ${employeeToEdit.managers.map(m => m.full_name).join(', ')}` 
+                        : "Currently has no managers."}
+                    </div>
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                   <input 

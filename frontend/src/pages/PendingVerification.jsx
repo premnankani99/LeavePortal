@@ -11,7 +11,7 @@ export default function PendingVerification() {
     // Poll the backend every 3 seconds to check if status changed
     const interval = setInterval(() => {
       refreshUser();
-    }, 3000);
+    }, 15000);
     return () => clearInterval(interval);
   }, [refreshUser]);
 

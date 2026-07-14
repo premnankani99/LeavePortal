@@ -162,6 +162,9 @@ export default function EmployeeCompOff() {
                       <h4 className="font-bold text-gray-900 text-lg group-hover:text-[#7e57c2] transition-colors">{req.daysGranted} Days Requested</h4>
                     </div>
                     <p className="text-sm text-gray-600 ml-8 truncate max-w-sm">
+                      <span className="font-medium text-gray-700">Worked Dates:</span> {req.workedDates && Array.isArray(req.workedDates) ? req.workedDates.map(d => new Date(d).toLocaleDateString()).join(', ') : 'N/A'}
+                    </p>
+                    <p className="text-sm text-gray-600 ml-8 truncate max-w-sm">
                       <span className="font-medium text-gray-700">Reason:</span> {req.reason}
                     </p>
                   </div>

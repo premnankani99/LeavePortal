@@ -1,4 +1,5 @@
 import { X, CalendarDays, Clock, FileText, CheckCircle2, MessageSquare, AlertCircle } from 'lucide-react';
+import { formatActiveDateRanges } from '../../utils/dateUtils';
 import { Badge } from '../ui/badge';
 
 const formatTime = (dateString) => {
@@ -9,7 +10,7 @@ const formatTime = (dateString) => {
 export default function LeaveDetailsModal({ request, onClose }) {
   if (!request) return null;
 
-  const datesReq = `${new Date(request.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}${request.start_date !== request.end_date ? ` to ${new Date(request.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}`;
+  const datesReq = formatActiveDateRanges(request.start_date, request.end_date, request.withdrawn_dates);
   
   const submitDate = formatTime(request.created_at);
   const approvedDate = formatTime(request.approved_at);

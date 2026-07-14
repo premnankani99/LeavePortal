@@ -1,5 +1,5 @@
 import { CheckCircle, Clock, XCircle, RefreshCcw, CalendarDays, Loader2, AlertCircle, Eye, Ban } from 'lucide-react';
-
+import { formatActiveDateRanges } from '../../utils/dateUtils';
 const getStatusConfig = (status) => {
   switch (status) {
     case 'approved': return { label: 'Approved', icon: CheckCircle, cls: 'bg-emerald-50 text-emerald-700 border border-emerald-200' };
@@ -69,8 +69,12 @@ export default function LeaveHistoryTable({ loadingLeaves, filteredLeaves, statu
             const withdrawnDate = formatTime(req.withdrawn_at);
             const withdrawReqDate = formatTime(req.withdrawal_requested_at);
 
-            const startFmt = new Date(req.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            const endFmt = new Date(req.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const dateRange = formatActiveDateRanges(req.start_date, req.end_date, req.withdrawn_dates);
+            const typeClass = getLeaveTypeBgClass(req.leave_types?.name);
+
+            const currentPaid = req.paid_days !== null ? req.paid_days : req.total_days;
+            const hasUnpaid = req.total_days > currentPaid;
+            const canAdjust = hasUnpaid && user?.available_leaves > 0 && (req.status === 'pending' || req.status === 'approved');
             
             let sessionDisplay = "Half Day";
             let cleanReason = req.reason || '—';
@@ -81,13 +85,6 @@ export default function LeaveHistoryTable({ loadingLeaves, filteredLeaves, statu
                 cleanReason = req.reason.replace(/\[Half-Day: .*?\]\s*/, '');
               }
             }
-            
-            const dateRange = req.start_date === req.end_date ? startFmt : `${startFmt} – ${endFmt}`;
-            const typeClass = getLeaveTypeBgClass(req.leave_types?.name);
-
-            const currentPaid = req.paid_days !== null ? req.paid_days : req.total_days;
-            const hasUnpaid = req.total_days > currentPaid;
-            const canAdjust = hasUnpaid && user?.available_leaves > 0 && (req.status === 'pending' || req.status === 'approved');
             
             let showAdjust = false;
             if (canAdjust) {

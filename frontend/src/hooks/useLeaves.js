@@ -134,8 +134,7 @@ export const useAllRequests = () => {
         leave_types: { name: req.leave_type }
       }));
     },
-    enabled: role === 'admin' || role?.toLowerCase() === 'hr',
-    refetchInterval: 5000
+    enabled: role === 'admin' || role?.toLowerCase() === 'hr'
   });
 };
 
@@ -153,7 +152,10 @@ export const useUpdateRequestStatus = () => {
         },
         body: JSON.stringify({ status: newStatus, adminNote })
       });
-      if (!res.ok) throw new Error("Failed to update status");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to update status");
+      }
       return res.json();
     },
     onSuccess: () => {
@@ -176,8 +178,7 @@ export const usePendingVerifications = () => {
       if (!res.ok) throw new Error("Failed to fetch pending verifications");
       return res.json();
     },
-    enabled: role === 'admin' || role?.toLowerCase() === 'hr',
-    refetchInterval: 5000
+    enabled: role === 'admin' || role?.toLowerCase() === 'hr'
   });
 };
 
@@ -193,8 +194,23 @@ export const useVerifiedEmployees = () => {
       if (!res.ok) throw new Error("Failed to fetch verified employees");
       return res.json();
     },
-    enabled: role === 'admin' || role?.toLowerCase() === 'hr',
-    refetchInterval: 10000
+    enabled: role === 'admin' || role?.toLowerCase() === 'hr'
+  });
+};
+
+export const useManagers = () => {
+  const { role } = useAuth();
+  return useQuery({
+    queryKey: ['admin_managers'],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/admin/managers`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error("Failed to fetch managers");
+      return res.json();
+    },
+    enabled: role === 'admin' || role?.toLowerCase() === 'hr'
   });
 };
 
