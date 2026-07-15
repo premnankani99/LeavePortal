@@ -15,7 +15,7 @@ export default function EmployeeCompOff() {
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
   const { user } = useAuth();
   const { data: myCompOffs = [], isLoading } = useMyCompOffs();
-  const { data: availableLeaves = 0 } = useMyBalances();
+  const { data: { available_leaves: availableLeaves = 0, comp_off_leaves: compOffLeaves = 0 } = {} } = useMyBalances();
   const { data: myRequests = [], isLoading: loadingRequests } = useMyRequests();
   const { total_leaves = 0, inProbation, monthsSinceJoining } = useEmployeeDashboard();
 
@@ -96,7 +96,7 @@ export default function EmployeeCompOff() {
             <CalendarPlus className="w-5 h-5 text-blue-500 mb-1.5" />
             <h3 className="text-sm font-bold text-gray-700">Monthly Leaves ({new Date().toLocaleString('en-US', { month: 'long' })})</h3>
             <p className="text-[11px] text-gray-500 mb-2 leading-tight h-6">Active leaves for this month</p>
-            <div className="text-3xl font-black text-gray-800">{isLoading || loadingRequests ? <Clock className="w-5 h-5 animate-spin text-gray-400" /> : Math.min(availableLeaves, standardLeavesEarned)}</div>
+            <div className="text-3xl font-black text-gray-800">{isLoading || loadingRequests ? <Clock className="w-5 h-5 animate-spin text-gray-400" /> : availableLeaves}</div>
           </div>
 
           {/* Card 2: Comp-Offs */}
@@ -111,7 +111,7 @@ export default function EmployeeCompOff() {
             <Gift className="w-5 h-5 text-emerald-500 mb-1.5" />
             <h3 className="text-sm font-bold text-gray-700">Extra Comp-Offs</h3>
             <p className="text-[11px] text-gray-500 mb-2 leading-tight h-6">Available days from extra work</p>
-            <div className="text-3xl font-black text-gray-800">{isLoading ? <Clock className="w-5 h-5 animate-spin text-gray-400" /> : Math.max(0, availableLeaves - standardLeavesEarned)}</div>
+            <div className="text-3xl font-black text-gray-800">{isLoading ? <Clock className="w-5 h-5 animate-spin text-gray-400" /> : compOffLeaves}</div>
           </div>
 
           {/* Card 3: Final Balance */}
@@ -120,7 +120,7 @@ export default function EmployeeCompOff() {
             <CheckCircle2 className="w-5 h-5 text-white mb-1.5" />
             <h3 className="text-sm font-bold text-white">Current Balance</h3>
             <p className="text-[11px] text-purple-200 mb-2 leading-tight h-6">Total days you can take off right now</p>
-            <div className="text-4xl font-black text-white">{availableLeaves}</div>
+            <div className="text-4xl font-black text-white">{availableLeaves + compOffLeaves}</div>
           </div>
           
         </div>
@@ -299,8 +299,11 @@ export default function EmployeeCompOff() {
                     <CheckCircle2 className="w-6 h-6" />
                   </div>
                   <h4 className="font-bold text-blue-800 text-lg">Leave Credited</h4>
-                  <p className="text-sm text-blue-700 leading-relaxed">
-                    You have successfully received your standard allowance of <strong>{standardLeavesEarned} day(s)</strong> for {new Date().toLocaleString('en-US', { month: 'long' })}.
+                  <p className="text-sm text-blue-700 leading-relaxed mb-2">
+                    Your current Monthly Leave balance is <strong>{availableLeaves} day(s)</strong>.
+                  </p>
+                  <p className="text-xs text-blue-600 leading-relaxed bg-blue-100/50 p-2 rounded-lg">
+                    Your standard monthly allowance is <strong>{standardLeavesEarned} day(s)</strong> per month. 
                   </p>
                 </div>
               )}

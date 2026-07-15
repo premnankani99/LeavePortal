@@ -179,10 +179,7 @@ export default function Layout({ children }) {
                 <PlusCircle className="w-5 h-5 mr-3 shrink-0" />
                 Apply on Behalf
               </Link>
-              <Link to="/admin/away" className={`flex items-center px-4 py-3 rounded-lg transition-all duration-300 text-base font-medium group ${isActive('/admin/away') ? 'bg-[#7e57c2] text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
-                <Calendar className={`w-5 h-5 mr-3 shrink-0 transition-transform duration-300 ${!isActive('/admin/away') && 'group-hover:translate-x-1'}`} />
-                Away Calendar
-              </Link>
+
               <Link to="/holidays" className={`flex items-center px-4 py-3 rounded-lg transition-all duration-300 text-base font-medium group ${isActive('/holidays') ? 'bg-[#7e57c2] text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
                 <CalendarDays className={`w-5 h-5 mr-3 shrink-0 transition-transform duration-300 ${!isActive('/holidays') && 'group-hover:translate-x-1'}`} />
                 Holidays

@@ -21,6 +21,7 @@ export default function AdminCompOff() {
       <div className="mt-8">
         <CompOffBalanceOverview />
       </div>
+
     </div>
   );
 }

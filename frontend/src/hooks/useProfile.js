@@ -4,7 +4,7 @@ import { useMyRequests, useMyBalances } from './useLeaves';
 export const useProfile = () => {
   const { user, profile, role } = useAuth();
   const { data: myLeaves = [] } = useMyRequests();
-  const { data: myBalances = [] } = useMyBalances();
+  const { data: myBalances = { available_leaves: 0, comp_off_leaves: 0 } } = useMyBalances();
   
   const joinedDate = user?.date_of_joining ? new Date(user.date_of_joining) : (user?.created_at ? new Date(user.created_at) : new Date());
   const joinedStr = joinedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });

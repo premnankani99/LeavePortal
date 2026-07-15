@@ -20,7 +20,8 @@ export default function LeaveForm({ onSuccess }) {
     isHalfDay,
     selectedSession,
     myLeaves,
-    available_leaves
+    available_leaves,
+    comp_off_leaves
   } = useLeaveForm(onSuccess);
 
   if (loadingTypes) {
@@ -39,7 +40,7 @@ export default function LeaveForm({ onSuccess }) {
           <p className="text-sm text-gray-500 mt-1">Please fill in your details and select the dates.</p>
         </div>
         <div className="bg-purple-50 text-[#7e57c2] px-3 py-1.5 rounded-lg text-sm font-semibold border border-purple-100">
-          Balance: {available_leaves} Days
+          Balance: {(available_leaves || 0) + (comp_off_leaves || 0)} Days
         </div>
       </CardHeader>
       <CardContent>

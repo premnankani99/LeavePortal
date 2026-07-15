@@ -21,14 +21,17 @@ export const useMyBalances = () => {
   return useQuery({
     queryKey: ['leave_balances', user?.id],
     queryFn: async () => {
-      if (!user) return 0;
+      if (!user) return { available_leaves: 0, comp_off_leaves: 0 };
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error("Failed to fetch balance");
       const data = await res.json();
-      return data.user?.available_leaves || 0;
+      return {
+        available_leaves: data.user?.available_leaves || 0,
+        comp_off_leaves: data.user?.comp_off_leaves || 0
+      };
     },
     enabled: !!user
   });

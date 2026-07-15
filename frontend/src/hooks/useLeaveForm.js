@@ -12,7 +12,7 @@ export const useLeaveForm = (onSuccess) => {
   const { user } = useAuth();
   const { data: leaveTypes = [], isLoading: loadingTypes } = useLeaveTypes();
   const { data: myLeaves = [] } = useMyRequests();
-  const { data: available_leaves = 0 } = useMyBalances();
+  const { data: { available_leaves = 0, comp_off_leaves = 0 } = {} } = useMyBalances();
   const { holidaysList } = useHolidays();
   const createRequest = useCreateRequest();
   const toast = useToast();
@@ -92,20 +92,20 @@ export const useLeaveForm = (onSuccess) => {
       const monthsSinceJoining = (diffYears * 12) + diffMonths;
 
       const inProbation = monthsSinceJoining < 6;
-      let availablePaid = available_leaves || 0;
+      let availablePaid = (available_leaves || 0) + (comp_off_leaves || 0);
       
       const breakdown = calculateMultiDateBreakdown(expandedDates, availablePaid, isHalfDay, holidaysList);
       
       // Also add probation warning to breakdown
       breakdown.inProbation = inProbation;
       // Add actual balance for messaging
-      breakdown.actualBalance = available_leaves || 0;
+      breakdown.actualBalance = (available_leaves || 0) + (comp_off_leaves || 0);
       
       setLeaveBreakdown(breakdown);
     } else {
       setLeaveBreakdown(null);
     }
-  }, [expandedDates, selectedTypeId, myLeaves, user, isHalfDay, available_leaves, holidaysList]);
+  }, [expandedDates, selectedTypeId, myLeaves, user, isHalfDay, available_leaves, comp_off_leaves, holidaysList]);
 
   const onSubmit = (data) => {
     const formattedDates = expandedDates.map(d => {
@@ -119,7 +119,7 @@ export const useLeaveForm = (onSuccess) => {
     formattedDates.sort();
 
     // Synchronously calculate working days to avoid stale state issues
-    const syncBreakdown = calculateMultiDateBreakdown(expandedDates, available_leaves || 0, data.is_half_day, holidaysList);
+    const syncBreakdown = calculateMultiDateBreakdown(expandedDates, (available_leaves || 0) + (comp_off_leaves || 0), data.is_half_day, holidaysList);
 
     const requestPayload = {
       leave_type_id: data.leave_type_id,
@@ -153,6 +153,7 @@ export const useLeaveForm = (onSuccess) => {
     isHalfDay,
     selectedSession,
     myLeaves,
-    available_leaves
+    available_leaves,
+    comp_off_leaves
   };
 };

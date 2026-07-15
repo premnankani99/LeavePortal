@@ -108,11 +108,11 @@ export const useAdminApplyLeave = (onSuccess, employees = []) => {
       const monthsSinceJoining = (diffYears * 12) + diffMonths;
 
       const inProbation = monthsSinceJoining < 6;
-      let availablePaid = employeeData.available_leaves || 0;
+      let availablePaid = (employeeData.available_leaves || 0) + (employeeData.comp_off_leaves || 0);
       
       const breakdown = calculateMultiDateBreakdown(expandedDates, availablePaid, isHalfDay, holidaysList);
       breakdown.inProbation = inProbation;
-      breakdown.actualBalance = employeeData.available_leaves || 0;
+      breakdown.actualBalance = (employeeData.available_leaves || 0) + (employeeData.comp_off_leaves || 0);
       
       setLeaveBreakdown(breakdown);
     } else {
@@ -137,7 +137,7 @@ export const useAdminApplyLeave = (onSuccess, employees = []) => {
     formattedDates.sort();
 
     // Synchronously calculate working days to avoid stale state issues
-    const syncBreakdown = calculateMultiDateBreakdown(expandedDates, employeeData?.available_leaves || 0, data.is_half_day, holidaysList);
+    const syncBreakdown = calculateMultiDateBreakdown(expandedDates, (employeeData?.available_leaves || 0) + (employeeData?.comp_off_leaves || 0), data.is_half_day, holidaysList);
 
     const requestPayload = {
       employee_id: selectedEmployeeId,

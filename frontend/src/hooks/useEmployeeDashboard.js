@@ -39,6 +39,8 @@ export function useEmployeeDashboard() {
 
   // The available leaves balance directly from the DB
   const availablePaid = profile?.available_leaves || 0;
+  const compOffLeaves = profile?.comp_off_leaves || 0;
+  const totalAvailable = availablePaid + compOffLeaves;
   const daysTakenThisMonth = 0; // Keeping this if used elsewhere in UI
 
   return {
@@ -49,7 +51,9 @@ export function useEmployeeDashboard() {
     inProbation,
     firstName: profile?.full_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || 'Employee',
     greeting: getGreeting(),
-    available_leaves: profile?.available_leaves || 0,
+    available_leaves: totalAvailable, // Send total as available_leaves for backward compatibility in some components
+    monthly_leaves: availablePaid,
+    comp_off_leaves: compOffLeaves,
     total_leaves: profile?.total_leaves || 0
   };
 }

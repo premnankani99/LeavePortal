@@ -46,7 +46,7 @@ export default function AdminApplyLeaveForm({ onSuccess }) {
         </div>
         {selectedEmployeeId && !loadingEmployee && (
           <div className="bg-purple-50 text-[#7e57c2] px-3 py-1.5 rounded-lg text-sm font-semibold border border-purple-100">
-            Balance: {available_leaves} Days
+            Balance: {(employeeData?.available_leaves || 0) + (employeeData?.comp_off_leaves || 0)} Days
           </div>
         )}
       </CardHeader>
