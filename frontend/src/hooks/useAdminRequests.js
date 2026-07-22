@@ -3,6 +3,7 @@ import { useAllRequests, usePendingVerifications, useUpdateVerification, useUpda
 import { useToast } from '../context/ToastContext';
 
 export const useAdminRequests = () => {
+    console.log("[Frontend Component] Rendering useAdminRequests in useAdminRequests.js");
   const { data: allRequests = [], isLoading: loadingReqs } = useAllRequests();
   const { data: pendingVerifications = [], isLoading: loadingVerifications } = usePendingVerifications();
   const verifyMutation = useUpdateVerification();
@@ -13,6 +14,7 @@ export const useAdminRequests = () => {
   const [comments, setComments] = useState({});
 
   const handleVerify = (userId) => {
+    console.log("[Frontend Component] Rendering handleVerify in useAdminRequests.js");
     verifyMutation.mutate({ userId, status: 'verified' }, {
       onSuccess: () => toast.success("Employee verified successfully!"),
       onError: (err) => toast.error("Failed to verify employee: " + err.message)
@@ -20,10 +22,12 @@ export const useAdminRequests = () => {
   };
 
   const handleReject = (userId, name) => {
+    console.log("[Frontend Component] Rendering handleReject in useAdminRequests.js");
     setRejectTarget({ id: userId, name });
   };
 
   const confirmReject = () => {
+    console.log("[Frontend Component] Rendering confirmReject in useAdminRequests.js");
     if (rejectTarget) {
       verifyMutation.mutate({ userId: rejectTarget.id, status: 'rejected' }, {
         onSuccess: () => toast.success("Employee rejected."),
@@ -34,10 +38,12 @@ export const useAdminRequests = () => {
   };
 
   const handleCommentChange = (id, value) => {
+    console.log("[Frontend Component] Rendering handleCommentChange in useAdminRequests.js");
     setComments(prev => ({ ...prev, [id]: value }));
   };
 
   const handleAction = (requestId, newStatus) => {
+    console.log("[Frontend Component] Rendering handleAction in useAdminRequests.js");
     const adminNote = comments[requestId] || '';
     
     if (newStatus === 'rejected' && !adminNote.trim()) {

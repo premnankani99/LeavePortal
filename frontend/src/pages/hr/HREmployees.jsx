@@ -11,6 +11,7 @@ export default function HREmployees() {
 
   // Handle row click to navigate to the detailed employee view
   const handleRowClick = (employee) => {
+    console.log("[Frontend Component] Rendering handleRowClick in HREmployees.jsx");
     navigate(`/hr/employees/${employee.id}`);
   };
 

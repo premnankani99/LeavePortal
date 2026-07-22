@@ -17,6 +17,7 @@ export default function DashboardHeader({ pendingVerifsCount }) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in DashboardHeader.jsx");
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);

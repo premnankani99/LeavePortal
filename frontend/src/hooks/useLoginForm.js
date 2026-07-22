@@ -4,6 +4,7 @@ import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 
 export const useLoginForm = () => {
+    console.log("[Frontend Component] Rendering useLoginForm in useLoginForm.js");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,6 +15,7 @@ export const useLoginForm = () => {
 
   // Redirect if already logged in
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in useLoginForm.js");
     if (user) {
       if (role === 'admin') {
         navigate('/admin', { replace: true });
@@ -24,6 +26,7 @@ export const useLoginForm = () => {
   }, [user, role, navigate]);
 
   const handleLogin = async (e) => {
+    console.log("[Frontend Async] Executing handleLogin in useLoginForm.js");
     e.preventDefault();
     setLoading(true);
     

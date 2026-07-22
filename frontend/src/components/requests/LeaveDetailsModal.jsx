@@ -3,6 +3,7 @@ import { formatActiveDateRanges } from '../../utils/dateUtils';
 import { Badge } from '../ui/badge';
 
 const formatTime = (dateString) => {
+    console.log("[Frontend Component] Rendering formatTime in LeaveDetailsModal.jsx");
   if (!dateString) return null;
   return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 };

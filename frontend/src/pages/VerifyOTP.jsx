@@ -16,12 +16,14 @@ export default function VerifyOTP() {
   const toast = useToast();
 
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in VerifyOTP.jsx");
     if (!email) {
       navigate('/login');
     }
   }, [email, navigate]);
 
   const handleSubmit = async (e) => {
+    console.log("[Frontend Async] Executing handleSubmit in VerifyOTP.jsx");
     e.preventDefault();
     setLoading(true);
 

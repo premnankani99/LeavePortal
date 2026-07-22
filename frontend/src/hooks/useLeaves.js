@@ -4,6 +4,7 @@ import { API_BASE_URL } from '../utils/config';
 
 // Hardcoded Leave Types since we removed the table
 export const useLeaveTypes = () => {
+    console.log("[Frontend Component] Rendering useLeaveTypes in useLeaves.js");
   return useQuery({
     queryKey: ['leave_types'],
     queryFn: async () => {
@@ -17,6 +18,7 @@ export const useLeaveTypes = () => {
 };
 
 export const useMyBalances = () => {
+    console.log("[Frontend Component] Rendering useMyBalances in useLeaves.js");
   const { user } = useAuth();
   return useQuery({
     queryKey: ['leave_balances', user?.id],
@@ -39,6 +41,7 @@ export const useMyBalances = () => {
 
 // Hooks for Leave Requests
 export const useMyRequests = () => {
+    console.log("[Frontend Component] Rendering useMyRequests in useLeaves.js");
   const { user } = useAuth();
   return useQuery({
     queryKey: ['leave_requests', user?.id],
@@ -61,6 +64,7 @@ export const useMyRequests = () => {
 };
 
 export const useCreateRequest = () => {
+    console.log("[Frontend Component] Rendering useCreateRequest in useLeaves.js");
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -91,6 +95,7 @@ export const useCreateRequest = () => {
 };
 
 export const useWithdrawRequest = () => {
+    console.log("[Frontend Component] Rendering useWithdrawRequest in useLeaves.js");
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -121,6 +126,7 @@ export const useWithdrawRequest = () => {
 // ==========================================
 
 export const useAllRequests = () => {
+    console.log("[Frontend Component] Rendering useAllRequests in useLeaves.js");
   const { role } = useAuth();
   return useQuery({
     queryKey: ['admin_all_requests'],
@@ -142,6 +148,7 @@ export const useAllRequests = () => {
 };
 
 export const useUpdateRequestStatus = () => {
+    console.log("[Frontend Component] Rendering useUpdateRequestStatus in useLeaves.js");
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -170,6 +177,7 @@ export const useUpdateRequestStatus = () => {
 
 // Admin Verification
 export const usePendingVerifications = () => {
+    console.log("[Frontend Component] Rendering usePendingVerifications in useLeaves.js");
   const { role } = useAuth();
   return useQuery({
     queryKey: ['admin_pending_verifications'],
@@ -186,6 +194,7 @@ export const usePendingVerifications = () => {
 };
 
 export const useVerifiedEmployees = () => {
+    console.log("[Frontend Component] Rendering useVerifiedEmployees in useLeaves.js");
   const { role } = useAuth();
   return useQuery({
     queryKey: ['admin_verified_employees'],
@@ -202,6 +211,7 @@ export const useVerifiedEmployees = () => {
 };
 
 export const useManagers = () => {
+    console.log("[Frontend Component] Rendering useManagers in useLeaves.js");
   const { role } = useAuth();
   return useQuery({
     queryKey: ['admin_managers'],
@@ -218,6 +228,7 @@ export const useManagers = () => {
 };
 
 export const useUpdateVerification = () => {
+    console.log("[Frontend Component] Rendering useUpdateVerification in useLeaves.js");
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ userId, status }) => {
@@ -242,6 +253,7 @@ export const useUpdateVerification = () => {
 };
 
 export const useAdminCreateRequestOnBehalf = () => {
+    console.log("[Frontend Component] Rendering useAdminCreateRequestOnBehalf in useLeaves.js");
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (requestData) => {
@@ -252,7 +264,7 @@ export const useAdminCreateRequestOnBehalf = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(requestData)
+        body: JSON.stringify({ ...requestData, leave_type: requestData.leave_type_id || "Casual Leave" })
       });
       if (!res.ok) {
         const data = await res.json();
@@ -268,6 +280,7 @@ export const useAdminCreateRequestOnBehalf = () => {
 };
 
 export const useAdjustLeave = () => {
+    console.log("[Frontend Component] Rendering useAdjustLeave in useLeaves.js");
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ leaveId }) => {

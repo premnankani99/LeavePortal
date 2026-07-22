@@ -6,6 +6,7 @@ export default function AdminApplyLeave() {
   const navigate = useNavigate();
 
   const handleSuccess = () => {
+    console.log("[Frontend Component] Rendering handleSuccess in AdminApplyLeave.jsx");
     // Navigate to admin leaves queue after successful submission
     navigate('/admin/leave-queue');
   };

@@ -24,6 +24,7 @@ export default function AdminApplyLeaveForm({ onSuccess }) {
     selectedSession,
     myLeaves,
     available_leaves,
+    employeeData,
     selectedEmployeeId,
     setSelectedEmployeeId,
     loadingEmployee

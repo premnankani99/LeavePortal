@@ -1,6 +1,7 @@
 import { CheckCircle, Clock, XCircle, RefreshCcw, CalendarDays, Loader2, AlertCircle, Eye, Ban } from 'lucide-react';
 import { formatActiveDateRanges } from '../../utils/dateUtils';
 const getStatusConfig = (status) => {
+    console.log("[Frontend Component] Rendering getStatusConfig in LeaveHistoryTable.jsx");
   switch (status) {
     case 'approved': return { label: 'Approved', icon: CheckCircle, cls: 'bg-emerald-50 text-emerald-700 border border-emerald-200' };
     case 'rejected': return { label: 'Rejected', icon: XCircle, cls: 'bg-red-50 text-red-700 border border-red-200' };
@@ -11,6 +12,7 @@ const getStatusConfig = (status) => {
 };
 
 const getLeaveTypeBgClass = (typeName) => {
+    console.log("[Frontend Component] Rendering getLeaveTypeBgClass in LeaveHistoryTable.jsx");
   if (!typeName) return 'bg-purple-500';
   const lower = typeName.toLowerCase();
   if (lower.includes('casual')) return 'bg-purple-500';
@@ -21,6 +23,7 @@ const getLeaveTypeBgClass = (typeName) => {
 };
 
 const formatTime = (dateString) => {
+    console.log("[Frontend Component] Rendering formatTime in LeaveHistoryTable.jsx");
   if (!dateString) return null;
   return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 };

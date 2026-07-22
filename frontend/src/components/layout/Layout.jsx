@@ -16,6 +16,7 @@ export default function Layout({ children }) {
   const notificationRef = useRef(null);
   
   const markAllAsRead = () => {
+    console.log("[Frontend Component] Rendering markAllAsRead in Layout.jsx");
     if (user?.id) {
       localStorage.setItem(`notif_read_${user.id}`, Date.now().toString());
       // Force a re-render by dispatching a custom event or just let it update on next poll.
@@ -26,6 +27,7 @@ export default function Layout({ children }) {
 
   const [lastRead, setLastRead] = useState(Date.now());
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in Layout.jsx");
     const updateRead = () => setLastRead(Date.now());
     window.addEventListener('notifications_read', updateRead);
     return () => window.removeEventListener('notifications_read', updateRead);
@@ -35,7 +37,9 @@ export default function Layout({ children }) {
   const hasUnreadNotifications = unreadNotifications.length > 0;
 
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in Layout.jsx");
     const handleClickOutside = (event) => {
+    console.log("[Frontend Component] Rendering handleClickOutside in Layout.jsx");
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotifications(false);
       }
@@ -46,6 +50,7 @@ export default function Layout({ children }) {
 
   // Clear unread notifications when viewing relevant pages
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in Layout.jsx");
     const clearPaths = [
       '/notifications',
       '/admin/leave-queue',
@@ -61,10 +66,12 @@ export default function Layout({ children }) {
 
   // Close mobile menu when route changes
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in Layout.jsx");
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
   const handleNotificationClick = (link) => {
+    console.log("[Frontend Component] Rendering handleNotificationClick in Layout.jsx");
     setShowNotifications(false);
     if (link) {
       navigate(link);
@@ -74,23 +81,27 @@ export default function Layout({ children }) {
   };
 
   const handleLogout = async () => {
+    console.log("[Frontend Async] Executing handleLogout in Layout.jsx");
     await logout();
     navigate('/login');
   }
 
   const getInitials = (u) => {
+    console.log("[Frontend Component] Rendering getInitials in Layout.jsx");
     const nameToUse = u?.full_name || u?.email || 'U';
     const match = nameToUse.match(/[a-zA-Z]/);
     return match ? match[0].toUpperCase() : 'U';
   };
 
   const formatRole = (r) => {
+    console.log("[Frontend Component] Rendering formatRole in Layout.jsx");
     if (!r) return '';
     if (r.toLowerCase() === 'hr') return 'HR';
     return r.charAt(0).toUpperCase() + r.slice(1).toLowerCase();
   };
 
   const formatName = (name) => {
+    console.log("[Frontend Component] Rendering formatName in Layout.jsx");
     if (!name) return '';
     return name
       .split(' ')
@@ -197,8 +208,8 @@ export default function Layout({ children }) {
                 <Users className={`w-5 h-5 mr-3 shrink-0 transition-transform duration-300 ${!isActive('/hr/employees') && 'group-hover:translate-x-1'}`} />
                 Employees
               </Link>
-              <Link to="/hr/leaves" className={`flex items-center px-4 py-3 rounded-lg transition-all duration-300 text-base font-medium group ${isActive('/hr/leaves') ? 'bg-[#7e57c2] text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
-                <Inbox className={`w-5 h-5 mr-3 shrink-0 transition-transform duration-300 ${!isActive('/hr/leaves') && 'group-hover:translate-x-1'}`} />
+              <Link to="/hr/history" className={`flex items-center px-4 py-3 rounded-lg transition-all duration-300 text-base font-medium group ${isActive('/hr/history') ? 'bg-[#7e57c2] text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
+                <Inbox className={`w-5 h-5 mr-3 shrink-0 transition-transform duration-300 ${!isActive('/hr/history') && 'group-hover:translate-x-1'}`} />
                 Leave History
               </Link>
               <Link to="/hr/away" className={`flex items-center px-4 py-3 rounded-lg transition-all duration-300 text-base font-medium group ${isActive('/hr/away') ? 'bg-[#7e57c2] text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
@@ -256,7 +267,7 @@ export default function Layout({ children }) {
                isActive('/admin/comp-off') ? 'Comp-Off Management' : 
                isActive('/admin/apply-leave') ? 'Apply Leave on Behalf' : 
                isActive('/leaves') ? 'Leave History' : 
-               isActive('/hr/leaves') ? 'Leave History' : 
+               isActive('/hr/history') ? 'Leave History' : 
                isActive('/my-comp-offs') ? 'My Comp-Offs' :
                isActive('/holidays') ? 'Company Holidays' : 
                isActive('/apply-leave') ? 'Apply for Leave' : 

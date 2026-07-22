@@ -5,6 +5,7 @@ import { API_BASE_URL } from '../utils/config';
 import { useAuth } from '../context/AuthContext';
 
 export const useAdminEmployees = () => {
+    console.log("[Frontend Component] Rendering useAdminEmployees in useAdminEmployees.js");
   const { data: verifiedEmployees = [], isLoading } = useVerifiedEmployees();
   const [search, setSearch] = useState('');
   const [department, setDepartment] = useState('All');

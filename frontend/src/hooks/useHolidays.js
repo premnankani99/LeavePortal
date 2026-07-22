@@ -3,6 +3,7 @@ import { API_BASE_URL } from '../utils/config';
 import { useAuth } from '../context/AuthContext';
 
 export const useHolidays = () => {
+    console.log("[Frontend Component] Rendering useHolidays in useHolidays.js");
   const currentYear = new Date().getFullYear();
   const queryClient = useQueryClient();
   const { user } = useAuth();

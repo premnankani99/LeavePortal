@@ -9,6 +9,7 @@ const inputClass = "w-full py-2.5 px-3.5 rounded-md border border-gray-300 text-
 export default function LeaveDatePicker({ control, isHalfDay, errors, myLeaves = [], allowPastDates = false }) {
   const now = new Date();
   const maxDate = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+    const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
   const appliedDates = new Set();
   myLeaves.forEach(leave => {
@@ -49,7 +50,7 @@ export default function LeaveDatePicker({ control, isHalfDay, errors, myLeaves =
               field.onChange(dates);
             }}
             format="YYYY-MM-DD"
-            minDate={allowPastDates ? undefined : new Date()}
+            minDate={allowPastDates ? prevMonthDate : new Date()}
             maxDate={maxDate}
             inputClass={inputClass}
             containerClassName="w-full sm:w-1/2"

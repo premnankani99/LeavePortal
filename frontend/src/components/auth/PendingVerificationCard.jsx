@@ -9,6 +9,7 @@ export default function PendingVerificationCard({ logout }) {
   const isRejected = verificationStatus === 'rejected';
 
   const handleTryAgain = () => {
+    console.log("[Frontend Component] Rendering handleTryAgain in PendingVerificationCard.jsx");
     logout();
     navigate('/register');
   };

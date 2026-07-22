@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { API_BASE_URL } from '../utils/config';
+import { useAuth } from '../context/AuthContext';
 
 export const useCompOffHistory = () => {
   return useQuery({
@@ -82,7 +83,9 @@ export const useRequestCompOff = () => {
   });
 };
 export const usePendingCompOffRequests = () => {
+  const { role } = useAuth();
   return useQuery({
+    enabled: role === 'admin' || role === 'hr',
     queryKey: ['pending_comp_offs'],
     queryFn: async () => {
       const token = localStorage.getItem('token');

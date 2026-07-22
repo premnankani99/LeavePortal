@@ -42,6 +42,7 @@ const queryClient = new QueryClient({
   },
 });
 const ProtectedRoute = ({ children, allowedRoles }) => {
+    console.log("[Frontend Component] Rendering ProtectedRoute in App.jsx");
   const { user, role, isVerified } = useAuth();
   
   if (!user) {

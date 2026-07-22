@@ -6,15 +6,17 @@ import { API_BASE_URL } from '../utils/config';
 
 // Fetch specific employee info
 const fetchEmployee = async (id) => {
+    console.log("[Frontend Async] Executing fetchEmployee in AdminEmployeeDetail.jsx");
   const token = localStorage.getItem('token');
   const res = await fetch(`${API_BASE_URL}/api/admin/verified`, { headers: { 'Authorization': `Bearer ${token}` } });
   if (!res.ok) throw new Error('Failed to fetch employee');
   const employees = await res.json();
-  return employees.find(e => e.id === id);
+  return employees.find(e => e.id === parseInt(id));
 };
 
 // Fetch employee leaves
 const fetchEmployeeLeaves = async (id) => {
+    console.log("[Frontend Async] Executing fetchEmployeeLeaves in AdminEmployeeDetail.jsx");
   const token = localStorage.getItem('token');
   const res = await fetch(`${API_BASE_URL}/api/leaves/employee/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
   if (!res.ok) throw new Error('Failed to fetch leaves');
@@ -37,6 +39,7 @@ export default function AdminEmployeeDetail() {
   });
 
   const changeMonth = (offset) => {
+    console.log("[Frontend Component] Rendering changeMonth in AdminEmployeeDetail.jsx");
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + offset, 1));
   };
 
@@ -45,6 +48,7 @@ export default function AdminEmployeeDetail() {
 
   // Helper to get leave status for a specific day
   const getLeaveForDay = (day) => {
+    console.log("[Frontend Component] Rendering getLeaveForDay in AdminEmployeeDetail.jsx");
     if (!leaves) return null;
     const dateToCheck = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     
@@ -88,6 +92,7 @@ export default function AdminEmployeeDetail() {
 
   // Calculate Monthly Summary
   const calculateSummary = () => {
+    console.log("[Frontend Component] Rendering calculateSummary in AdminEmployeeDetail.jsx");
     let totalWorkingDays = 0;
     let daysPresent = 0;
     let paidLeaveUsed = 0;
@@ -126,6 +131,7 @@ export default function AdminEmployeeDetail() {
   const summary = calculateSummary();
 
   const handleExport = () => {
+    console.log("[Frontend Component] Rendering handleExport in AdminEmployeeDetail.jsx");
     // Generate CSV
     let csv = 'Date,Day,Status,Leave Type,Paid/Unpaid\n';
     

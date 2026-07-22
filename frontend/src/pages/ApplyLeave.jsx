@@ -7,6 +7,7 @@ export default function ApplyLeave() {
   const navigate = useNavigate();
 
   const handleSuccess = () => {
+    console.log("[Frontend Component] Rendering handleSuccess in ApplyLeave.jsx");
     // Navigate to leave history after successful submission
     navigate('/leaves');
   };

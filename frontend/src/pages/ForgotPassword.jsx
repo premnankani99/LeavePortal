@@ -13,6 +13,7 @@ export default function ForgotPassword() {
   const toast = useToast();
 
   const handleSubmit = async (e) => {
+    console.log("[Frontend Async] Executing handleSubmit in ForgotPassword.jsx");
     e.preventDefault();
     setLoading(true);
 

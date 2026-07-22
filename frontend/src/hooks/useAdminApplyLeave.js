@@ -174,6 +174,7 @@ export const useAdminApplyLeave = (onSuccess, employees = []) => {
     selectedSession,
     myLeaves: employeeData?.leaves || [],
     available_leaves: employeeData?.available_leaves || 0,
+    employeeData,
     selectedEmployeeId,
     setSelectedEmployeeId,
     loadingEmployee

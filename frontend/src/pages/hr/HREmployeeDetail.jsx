@@ -7,15 +7,17 @@ import { API_BASE_URL } from '../../utils/config';
 
 // Fetch specific employee info
 const fetchEmployee = async (id) => {
+    console.log("[Frontend Async] Executing fetchEmployee in HREmployeeDetail.jsx");
   const token = localStorage.getItem('token');
   const res = await fetch(`${API_BASE_URL}/api/admin/verified`, { headers: { 'Authorization': `Bearer ${token}` } });
   if (!res.ok) throw new Error('Failed to fetch employee');
   const employees = await res.json();
-  return employees.find(e => e.id === id);
+  return employees.find(e => e.id === parseInt(id));
 };
 
 // Fetch employee leaves
 const fetchEmployeeLeaves = async (id) => {
+    console.log("[Frontend Async] Executing fetchEmployeeLeaves in HREmployeeDetail.jsx");
   const token = localStorage.getItem('token');
   const res = await fetch(`${API_BASE_URL}/api/leaves/employee/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
   if (!res.ok) throw new Error('Failed to fetch leaves');
@@ -38,6 +40,7 @@ export default function HREmployeeDetail() {
   });
 
   const changeMonth = (offset) => {
+    console.log("[Frontend Component] Rendering changeMonth in HREmployeeDetail.jsx");
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + offset, 1));
   };
 
@@ -46,6 +49,7 @@ export default function HREmployeeDetail() {
 
   // Helper to get leave status for a specific day
   const getLeaveForDay = (day) => {
+    console.log("[Frontend Component] Rendering getLeaveForDay in HREmployeeDetail.jsx");
     if (!leaves) return null;
     const dateToCheck = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     
@@ -90,6 +94,7 @@ export default function HREmployeeDetail() {
 
   // Calculate Monthly Summary
   const calculateSummary = () => {
+    console.log("[Frontend Component] Rendering calculateSummary in HREmployeeDetail.jsx");
     let totalWorkingDays = 0;
     let daysPresent = 0;
     let paidLeaveUsed = 0;
@@ -156,6 +161,7 @@ export default function HREmployeeDetail() {
   }, [leaves]);
 
   const handleExport = () => {
+    console.log("[Frontend Component] Rendering handleExport in HREmployeeDetail.jsx");
     // Generate CSV
     let csv = 'Date,Day,Status,Leave Type,Paid/Unpaid\n';
     

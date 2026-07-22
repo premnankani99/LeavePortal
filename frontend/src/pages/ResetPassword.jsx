@@ -20,12 +20,14 @@ export default function ResetPassword() {
   const toast = useToast();
 
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in ResetPassword.jsx");
     if (!email) {
       navigate('/login');
     }
   }, [email, navigate]);
 
   const handleSubmit = async (e) => {
+    console.log("[Frontend Async] Executing handleSubmit in ResetPassword.jsx");
     e.preventDefault();
     if (password !== confirmPassword) {
       toast.error("Passwords do not match!");

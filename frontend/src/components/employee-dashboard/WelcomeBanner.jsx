@@ -5,6 +5,7 @@ export default function WelcomeBanner({ greeting, firstName, stats }) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in WelcomeBanner.jsx");
     const timer = setInterval(() => setCurrentTime(new Date()), 60000); // update every minute
     return () => clearInterval(timer);
   }, []);

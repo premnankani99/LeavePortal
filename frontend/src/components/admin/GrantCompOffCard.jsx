@@ -36,6 +36,7 @@ export default function GrantCompOffCard() {
   });
 
   const onSubmit = (data) => {
+    console.log("[Frontend Component] Rendering onSubmit in GrantCompOffCard.jsx");
     grantMutation.mutate(data, {
       onSuccess: (res) => {
         toast.success(`Comp-off granted. New leave balance is ${res.newBalance} days.`);

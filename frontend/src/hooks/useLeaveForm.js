@@ -9,6 +9,7 @@ import { useHolidays } from './useHolidays';
 import { useToast } from '../context/ToastContext';
 
 export const useLeaveForm = (onSuccess) => {
+    console.log("[Frontend Component] Rendering useLeaveForm in useLeaveForm.js");
   const { user } = useAuth();
   const { data: leaveTypes = [], isLoading: loadingTypes } = useLeaveTypes();
   const { data: myLeaves = [] } = useMyRequests();
@@ -56,6 +57,7 @@ export const useLeaveForm = (onSuccess) => {
     const end = datesArr[1];
     
     const getJsDate = (d) => {
+    console.log("[Frontend Component] Rendering getJsDate in useLeaveForm.js");
       if (!d) return null;
       if (d instanceof Date) return d;
       if (typeof d === 'string') return new Date(d);
@@ -77,12 +79,14 @@ export const useLeaveForm = (onSuccess) => {
 
   // If switched to Half Day, enforce single date selection
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in useLeaveForm.js");
     if (isHalfDay && selectedDates && selectedDates.length > 1) {
       setValue('dates', [selectedDates[0]]);
     }
   }, [isHalfDay, selectedDates, setValue]);
 
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in useLeaveForm.js");
     if (expandedDates && expandedDates.length > 0) {
       // Calculate probation and available paid leaves
       const joinedDate = new Date(user?.created_at || new Date());
@@ -108,6 +112,7 @@ export const useLeaveForm = (onSuccess) => {
   }, [expandedDates, selectedTypeId, myLeaves, user, isHalfDay, available_leaves, comp_off_leaves, holidaysList]);
 
   const onSubmit = (data) => {
+    console.log("[Frontend Component] Rendering onSubmit in useLeaveForm.js");
     const formattedDates = expandedDates.map(d => {
       if (typeof d === 'string') return d;
       if (d && typeof d.format === 'function') return d.format("YYYY-MM-DD");

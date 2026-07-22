@@ -4,6 +4,7 @@ import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 
 export const useRegisterForm = () => {
+    console.log("[Frontend Component] Rendering useRegisterForm in useRegisterForm.js");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -15,6 +16,7 @@ export const useRegisterForm = () => {
 
   // Redirect if already logged in
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in useRegisterForm.js");
     if (user) {
       if (role === 'admin') {
         navigate('/admin', { replace: true });
@@ -25,6 +27,7 @@ export const useRegisterForm = () => {
   }, [user, role, navigate]);
 
     const handleRegister = async (e) => {
+    console.log("[Frontend Async] Executing handleRegister in useRegisterForm.js");
     e.preventDefault();
     
     // Client-side Validation

@@ -13,10 +13,12 @@ export default function CompOffRequestsTable() {
   const [comments, setComments] = useState({});
 
   const handleCommentChange = (id, value) => {
+    console.log("[Frontend Component] Rendering handleCommentChange in CompOffRequestsTable.jsx");
     setComments(prev => ({ ...prev, [id]: value }));
   };
 
   const handleAction = (id, status) => {
+    console.log("[Frontend Component] Rendering handleAction in CompOffRequestsTable.jsx");
     const adminNote = comments[id] || '';
     
     if (status === 'rejected' && !adminNote.trim()) {

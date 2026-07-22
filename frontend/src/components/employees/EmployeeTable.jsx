@@ -22,6 +22,7 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
   const { user } = useAuth();
 
   const handleEditClick = (emp) => {
+    console.log("[Frontend Component] Rendering handleEditClick in EmployeeTable.jsx");
     setEmployeeToEdit(emp);
     setEditFormData({
       full_name: emp.full_name || '',
@@ -34,6 +35,7 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
   };
 
   const handleEditSubmit = async (e) => {
+    console.log("[Frontend Async] Executing handleEditSubmit in EmployeeTable.jsx");
     e.preventDefault();
     if (onUpdate && employeeToEdit) {
       await onUpdate({ id: employeeToEdit.id, data: editFormData });
@@ -42,11 +44,13 @@ export default function EmployeeTable({ filteredEmployees, isLoading, search, se
   };
 
   const handleDeleteClick = (emp) => {
+    console.log("[Frontend Component] Rendering handleDeleteClick in EmployeeTable.jsx");
     setEmployeeToDelete(emp);
     setShowConfirmModal(true);
   };
 
   const confirmDeletion = () => {
+    console.log("[Frontend Component] Rendering confirmDeletion in EmployeeTable.jsx");
     if (employeeToDelete && onDelete) {
       onDelete(employeeToDelete.id);
       setEmployeeToDelete(null);

@@ -8,6 +8,7 @@ export default function PendingVerification() {
   const { refreshUser } = useAuth();
 
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in PendingVerification.jsx");
     // Poll the backend every 3 seconds to check if status changed
     const interval = setInterval(() => {
       refreshUser();

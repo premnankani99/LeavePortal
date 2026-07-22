@@ -2,6 +2,7 @@
  * Checks if a date is a weekend (Sat/Sun) or public holiday
  */
 export const isNonWorkingDay = (dateStr, holidaysList = []) => {
+    console.log("[Frontend Component] Rendering isNonWorkingDay in dateUtils.js");
   const date = new Date(dateStr);
   const day = date.getDay();
   const isWeekend = day === 0 || day === 6; // 0=Sun, 6=Sat
@@ -17,6 +18,7 @@ export const isNonWorkingDay = (dateStr, holidaysList = []) => {
  * @param {Array} holidaysList - Array of holiday date strings (e.g., ['2026-01-26'])
  */
 export const calculateMultiDateBreakdown = (selectedDates, availablePaidLeaves, isHalfDay = false, holidaysList = []) => {
+    console.log("[Frontend Component] Rendering calculateMultiDateBreakdown in dateUtils.js");
   let totalWorkingDays = 0;
 
   selectedDates.forEach(dateObj => {
@@ -61,6 +63,7 @@ export const calculateMultiDateBreakdown = (selectedDates, availablePaidLeaves, 
  * e.g., "Jul 14 - Jul 15, Jul 17"
  */
 export const formatActiveDateRanges = (startDate, endDate, withdrawnDatesStr) => {
+    console.log("[Frontend Component] Rendering formatActiveDateRanges in dateUtils.js");
   let withdrawn = [];
   if (withdrawnDatesStr) {
     if (typeof withdrawnDatesStr === 'string') {
@@ -139,6 +142,7 @@ export const formatActiveDateRanges = (startDate, endDate, withdrawnDatesStr) =>
  * Original range-based breakdown
  */
 export const calculateLeaveBreakdown = (startDate, endDate, availablePaidLeaves, holidaysList = []) => {
+    console.log("[Frontend Component] Rendering calculateLeaveBreakdown in dateUtils.js");
   let totalWorkingDays = 0;
   let currentDate = new Date(startDate);
   const finalDate = new Date(endDate);

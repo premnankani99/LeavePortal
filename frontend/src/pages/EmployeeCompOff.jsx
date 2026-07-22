@@ -30,6 +30,7 @@ export default function EmployeeCompOff() {
   const standardLeavesEarned = total_leaves;
 
   const getStatusIcon = (status) => {
+    console.log("[Frontend Component] Rendering getStatusIcon in EmployeeCompOff.jsx");
     switch(status) {
       case 'approved': return <CheckCircle2 className="w-5 h-5 text-emerald-500" />;
       case 'rejected': return <XCircle className="w-5 h-5 text-red-500" />;
@@ -38,6 +39,7 @@ export default function EmployeeCompOff() {
   };
 
   const getStatusBadge = (status) => {
+    console.log("[Frontend Component] Rendering getStatusBadge in EmployeeCompOff.jsx");
     switch(status) {
       case 'approved': return <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Approved</span>;
       case 'rejected': return <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Rejected</span>;

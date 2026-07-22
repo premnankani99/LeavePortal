@@ -11,6 +11,7 @@ export default function Holidays() {
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleAddSubmit = async (e) => {
+    console.log("[Frontend Async] Executing handleAddSubmit in Holidays.jsx");
     e.preventDefault();
     setErrorMsg('');
     try {

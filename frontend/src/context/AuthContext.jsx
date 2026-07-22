@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { API_BASE_URL } from '../utils/config';
 
 export const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
+    console.log("[Frontend Component] Rendering AuthProvider in AuthContext.jsx");
+  const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
@@ -11,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in AuthContext.jsx");
     // Ye check karega ki pehle se koi user login hai ya nahi
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
@@ -29,6 +33,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const refreshUser = async () => {
+    console.log("[Frontend Async] Executing refreshUser in AuthContext.jsx");
     const token = localStorage.getItem('token');
     if (!token) return;
     try {
@@ -49,6 +54,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
+    console.log("[Frontend Async] Executing login in AuthContext.jsx");
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
@@ -80,6 +86,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (full_name, email, password) => {
+    console.log("[Frontend Async] Executing register in AuthContext.jsx");
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
@@ -110,6 +117,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const verifyOtp = async (email, otp) => {
+    console.log("[Frontend Async] Executing verifyOtp in AuthContext.jsx");
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
         method: 'POST',
@@ -121,6 +129,8 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+
+      queryClient.clear(); // Ensure fresh data fetch after login
       setUser(data.user);
       setRole(data.user.role);
       setIsVerified(data.user.verification_status === 'approved');
@@ -133,6 +143,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const forgotPassword = async (email) => {
+    console.log("[Frontend Async] Executing forgotPassword in AuthContext.jsx");
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
         method: 'POST',
@@ -148,6 +159,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const resetPassword = async (email, otp, newPassword) => {
+    console.log("[Frontend Async] Executing resetPassword in AuthContext.jsx");
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
         method: 'POST',
@@ -163,8 +175,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    console.log("[Frontend Async] Executing logout in AuthContext.jsx");
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    queryClient.clear(); // Clear all cached user data
     setUser(null);
     setRole(null);
     setIsVerified(false);

@@ -4,6 +4,7 @@ import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 
 export const useEmployeeLeaves = () => {
+    console.log("[Frontend Component] Rendering useEmployeeLeaves in useEmployeeLeaves.js");
   const { data: myLeaves = [], isLoading: loadingLeaves } = useMyRequests();
   const { data: leaveTypes = [] } = useLeaveTypes();
   const withdrawMutation = useWithdrawRequest();
@@ -17,6 +18,7 @@ export const useEmployeeLeaves = () => {
   const [withdrawTarget, setWithdrawTarget] = useState(null);
 
   const handleWithdraw = (datesToWithdraw = []) => {
+    console.log("[Frontend Component] Rendering handleWithdraw in useEmployeeLeaves.js");
     if (withdrawTarget) {
       withdrawMutation.mutate({ requestId: withdrawTarget.id, datesToWithdraw }, {
         onSuccess: () => {
@@ -31,6 +33,7 @@ export const useEmployeeLeaves = () => {
   };
 
   const handleAdjust = (leaveId) => {
+    console.log("[Frontend Component] Rendering handleAdjust in useEmployeeLeaves.js");
     adjustMutation.mutate({ leaveId }, {
       onSuccess: () => toast.success("Leave adjusted to Paid successfully!"),
       onError: (err) => toast.error(err.message)

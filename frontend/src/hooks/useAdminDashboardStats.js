@@ -5,8 +5,10 @@ import { Users, FileText, Briefcase, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const useAdminDashboardStats = () => {
+    console.log("[Frontend Component] Rendering useAdminDashboardStats in useAdminDashboardStats.js");
   const { data: verifiedEmployees = [], isLoading: loadingEmp } = useVerifiedEmployees();
-  const { data: allRequests = [], isLoading: loadingReq } = useAllRequests();
+  const { data: rawAllRequests = [], isLoading: loadingReq } = useAllRequests();
+  const allRequests = useMemo(() => rawAllRequests.filter(r => r.status !== 'withdrawn' && r.status !== 'cancelled'), [rawAllRequests]);
   const { data: pendingVerifs = [] } = usePendingVerifications();
   const { role } = useAuth();
 

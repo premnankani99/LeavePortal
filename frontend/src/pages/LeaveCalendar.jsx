@@ -3,6 +3,7 @@ import { useAllRequests } from '../hooks/useLeaves';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { ChevronLeft, ChevronRight, Calendar, UserX } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 
 dayjs.extend(isBetween);
@@ -19,7 +20,7 @@ export default function LeaveCalendar() {
     // Only approved leaves
     const approved = allRequests.filter(r => r.status === 'approved');
 
-    return approved.filter(req => {
+    const filtered = approved.filter(req => {
       const start = dayjs(req.start_date).startOf('day');
       const end = dayjs(req.end_date).endOf('day');
       const current = selectedDate.startOf('day');
@@ -40,6 +41,17 @@ export default function LeaveCalendar() {
       }
       return false;
     });
+
+    // Deduplicate by employee_id so the same person doesn't show up twice
+    const uniqueEmployees = [];
+    const seenIds = new Set();
+    for (const req of filtered) {
+      if (!seenIds.has(req.employee_id)) {
+        seenIds.add(req.employee_id);
+        uniqueEmployees.push(req);
+      }
+    }
+    return uniqueEmployees;
   }, [allRequests, selectedDate]);
 
   const displayDate = selectedDate.format('dddd, MMMM D, YYYY');
@@ -106,7 +118,7 @@ export default function LeaveCalendar() {
       ) : absentEmployees.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {absentEmployees.map(req => (
-            <div key={req.id} className="bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow rounded-2xl p-5 flex flex-col justify-between">
+            <Link to={`/admin/employees/${req.employee_id}`} key={req.id} className="bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow rounded-2xl p-5 flex flex-col justify-between hover:border-[#7e57c2] cursor-pointer">
               <div>
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="font-semibold text-gray-900 truncate pr-2">{req.profiles?.full_name}</h3>
@@ -130,7 +142,7 @@ export default function LeaveCalendar() {
                   Half Day
                 </div>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       ) : (

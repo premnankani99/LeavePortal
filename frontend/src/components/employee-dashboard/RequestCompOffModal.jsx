@@ -29,6 +29,7 @@ export default function RequestCompOffModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const onSubmit = (data) => {
+    console.log("[Frontend Component] Rendering onSubmit in RequestCompOffModal.jsx");
     const payload = {
       daysRequested: data.daysRequested,
       reason: data.reason,

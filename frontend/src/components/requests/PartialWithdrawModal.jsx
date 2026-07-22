@@ -7,6 +7,7 @@ export default function PartialWithdrawModal({ leave, onClose, onConfirm, isProc
   const [selectedDates, setSelectedDates] = useState([]);
 
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in PartialWithdrawModal.jsx");
     if (!leave) return;
     const start = new Date(leave.start_date);
     const end = new Date(leave.end_date);
@@ -66,12 +67,14 @@ export default function PartialWithdrawModal({ leave, onClose, onConfirm, isProc
   }, [leave]);
 
   const handleToggle = (dateStr) => {
+    console.log("[Frontend Component] Rendering handleToggle in PartialWithdrawModal.jsx");
     setSelectedDates(prev => 
       prev.includes(dateStr) ? prev.filter(d => d !== dateStr) : [...prev, dateStr]
     );
   };
 
   const handleWithdraw = () => {
+    console.log("[Frontend Component] Rendering handleWithdraw in PartialWithdrawModal.jsx");
     // If all unlocked days are selected, it's a full withdrawal
     // Otherwise partial
     onConfirm(selectedDates);

@@ -178,7 +178,8 @@ export const useNotifications = () => {
             time: timeAgo(leave.withdrawal_requested_at),
             icon: AlertCircle,
             iconBg: 'bg-orange-100 text-orange-600',
-            isUnread: tDate.getTime() > lastReadTime
+            isUnread: tDate.getTime() > lastReadTime,
+            link: '/leaves'
           });
         }
       });
@@ -193,7 +194,8 @@ export const useNotifications = () => {
           time: timeAgo(comp.grantedAt),
           icon: CheckCircle2,
           iconBg: 'bg-blue-100 text-blue-600',
-          isUnread: tDate.getTime() > lastReadTime
+          isUnread: tDate.getTime() > lastReadTime,
+          link: '/my-comp-offs'
         });
       });
     }
@@ -207,7 +209,8 @@ export const useNotifications = () => {
       time: 'A while ago',
       icon: Bell,
       iconBg: 'bg-purple-100 text-[#7e57c2]',
-      isUnread: false
+      isUnread: false,
+      link: '/profile'
     });
 
     // Sort by newest first

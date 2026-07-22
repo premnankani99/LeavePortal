@@ -3,6 +3,7 @@ import { useCreateAnnouncement } from './useAnnouncements';
 import { useToast } from '../context/ToastContext';
 
 export const useAnnouncementForm = (onSuccessCallback) => {
+    console.log("[Frontend Component] Rendering useAnnouncementForm in useAnnouncementForm.js");
   const createMutation = useCreateAnnouncement();
   const toast = useToast();
 
@@ -19,6 +20,7 @@ export const useAnnouncementForm = (onSuccessCallback) => {
   });
 
   const resetForm = () => {
+    console.log("[Frontend Component] Rendering resetForm in useAnnouncementForm.js");
     setFormData({
       title: '', message: '', priority: 'normal', category: 'general',
       target_audience: 'all', target_department_id: '', is_pinned: false,
@@ -27,6 +29,7 @@ export const useAnnouncementForm = (onSuccessCallback) => {
   };
 
   const handleSubmit = (e) => {
+    console.log("[Frontend Component] Rendering handleSubmit in useAnnouncementForm.js");
     e.preventDefault();
     if (!formData.title || !formData.message) {
       toast.error('Title and message are required');

@@ -9,6 +9,7 @@ export function useEmployeeDashboard() {
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
+        console.log("[Frontend Effect] Triggered in useEmployeeDashboard.js");
     if (!user?.id) return;
     
     // Fetch profile

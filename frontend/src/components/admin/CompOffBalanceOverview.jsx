@@ -19,6 +19,7 @@ export default function CompOffBalanceOverview() {
   );
 
   const getEmployeeCompOffs = (empId) => {
+    console.log("[Frontend Component] Rendering getEmployeeCompOffs in CompOffBalanceOverview.jsx");
     return compOffHistory.filter(c => c.employeeId === empId);
   };
 

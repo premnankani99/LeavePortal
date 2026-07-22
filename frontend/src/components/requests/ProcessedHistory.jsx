@@ -6,6 +6,7 @@ import LeaveDetailsModal from './LeaveDetailsModal';
 import { formatActiveDateRanges } from '../../utils/dateUtils';
 
 const formatTime = (dateString) => {
+    console.log("[Frontend Component] Rendering formatTime in ProcessedHistory.jsx");
   if (!dateString) return null;
   return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 };

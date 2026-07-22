@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useMyAnnouncements } from './useAnnouncements';
 
 export const useAnnouncementsFeed = () => {
+    console.log("[Frontend Component] Rendering useAnnouncementsFeed in useAnnouncementsFeed.js");
   const { data: announcements = [], isLoading } = useMyAnnouncements();
   const [selectedAnn, setSelectedAnn] = useState(null);
   const [filterCat, setFilterCat] = useState('all');

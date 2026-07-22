@@ -4,6 +4,7 @@ import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
 const ToastContext = createContext(null);
 
 export const useToast = () => {
+    console.log("[Frontend Component] Rendering useToast in ToastContext.jsx");
   const ctx = useContext(ToastContext);
   if (!ctx) throw new Error('useToast must be used inside ToastProvider');
   return ctx;

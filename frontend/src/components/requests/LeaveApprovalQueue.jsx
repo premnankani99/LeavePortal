@@ -17,6 +17,7 @@ export default function LeaveApprovalQueue({
   const { user } = useAuth();
 
   const handleAction = (id, action) => {
+    console.log("[Frontend Component] Rendering handleAction in LeaveApprovalQueue.jsx");
     const success = onAction(id, action);
     if (success !== false) {
       setSelectedRequest(null);

@@ -2,6 +2,7 @@ import { useAuth } from '../context/AuthContext';
 import { useMyRequests, useMyBalances } from './useLeaves';
 
 export const useProfile = () => {
+    console.log("[Frontend Component] Rendering useProfile in useProfile.js");
   const { user, profile, role } = useAuth();
   const { data: myLeaves = [] } = useMyRequests();
   const { data: myBalances = { available_leaves: 0, comp_off_leaves: 0 } } = useMyBalances();
